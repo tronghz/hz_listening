@@ -611,18 +611,18 @@
             </div>
 
             <div class="control-buttons">
-                <button class="add-button" onclick="addNewSentence()">
+                <!-- <button class="add-button" onclick="addNewSentence()">
                     ➕ Thêm Câu
-                </button>
+                </button> -->
                 <button class="import-button" onclick="showImportModal()">
                     📁 Nhập JSON
                 </button>
                 <button class="export-button" onclick="exportToJSON()">
                     💾 Xuất JSON
                 </button>
-                <button class="sync-button" onclick="syncWithFirebase()">
+                <!-- <button class="sync-button" onclick="syncWithFirebase()">
                     ☁️ Đồng Bộ
-                </button>
+                </button> -->
             </div>
 
             <div id="sentences-container">
@@ -723,8 +723,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-
-    <script>
+<script>
     // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
@@ -744,6 +743,7 @@
     let currentQuestionIndex = 0;
     let userAnswers = [];
     let firebaseConnected = false;
+    let unsubscribe = null; // Để quản lý real-time listener
 
     // Firebase connection status
     function updateConnectionStatus(connected) {
@@ -759,137 +759,133 @@
         }
     }
 
-    // Hàm thử tải từ Firebase với timeout và retry
-    async function tryLoadFromFirebase(maxRetries = 3) {
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                console.log(`🔄 Firebase connection attempt ${attempt}/${maxRetries}`);
-                
-                // Set timeout cho việc kết nối Firebase
-                const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Firebase timeout')), 8000)
-                );
-                
-                const loadPromise = db.collection('sentences').doc('user_data').get();
-                
-                // Race between timeout and actual load
-                const doc = await Promise.race([loadPromise, timeoutPromise]);
-                
-                updateConnectionStatus(true);
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.sentences && Array.isArray(data.sentences) && data.sentences.length > 0) {
-                        loadSentencesToContainer(data.sentences);
-                        console.log(`✅ Loaded ${data.sentences.length} sentences from Firebase`);
-                        return true;
+    // Setup real-time listener cho Firebase
+    function setupRealtimeListener() {
+        if (unsubscribe) {
+            unsubscribe(); // Hủy listener cũ nếu có
+        }
+
+        unsubscribe = db.collection('sentences').doc('user_data')
+            .onSnapshot(
+                (doc) => {
+                    updateConnectionStatus(true);
+                    
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.sentences && Array.isArray(data.sentences)) {
+                            // Chỉ cập nhật UI nếu dữ liệu thực sự thay đổi
+                            const currentSentences = getAllSentences();
+                            if (JSON.stringify(currentSentences) !== JSON.stringify(data.sentences)) {
+                                loadSentencesToContainer(data.sentences);
+                                console.log(`🔄 Real-time update: ${data.sentences.length} sentences`);
+                            }
+                        }
                     }
-                }
-                
-                console.log('ℹ️ Firebase connected but no data found');
-                return false;
-                
-            } catch (error) {
-                console.error(`❌ Firebase attempt ${attempt} failed:`, error.message);
-                
-                if (attempt === maxRetries) {
+                },
+                (error) => {
+                    console.error('Real-time listener error:', error);
                     updateConnectionStatus(false);
-                    return false;
+                    
+                    // Thử kết nối lại sau 5 giây
+                    setTimeout(setupRealtimeListener, 5000);
                 }
-                
-                // Đợi trước khi thử lại
-                await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
-            }
-        }
-        
-        return false;
+            );
     }
 
-    // Hàm thử kết nối lại Firebase
-    async function retryFirebaseConnection() {
-        console.log('🔄 Retrying Firebase connection...');
-        
-        const success = await tryLoadFromFirebase(2);
-        
-        if (success) {
-            showNotification('🔄 Đã đồng bộ với cloud', 'success');
-        } else {
-            // Thử lại sau 30 giây
-            setTimeout(retryFirebaseConnection, 30000);
-        }
-    }
-
-    // Sync with Firebase - improved version
-    async function syncWithFirebase() {
-        const syncButton = document.querySelector('.sync-button');
-        const originalContent = syncButton.innerHTML;
-
-        syncButton.innerHTML = '<div class="loading">⚙️</div> Đang đồng bộ...';
-        syncButton.disabled = true;
-
-        const indicator = document.getElementById('status-indicator');
-        indicator.className = 'status-indicator status-syncing';
-        indicator.innerHTML = '🟡 Đang đồng bộ...';
+    // Lưu trực tiếp lên Firebase (thay thế sync)
+    async function saveToFirebase() {
+        if (!firebaseConnected) return;
 
         try {
             const sentences = getAllSentences();
             const timestamp = new Date();
 
-            // Set timeout cho sync
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Sync timeout')), 10000)
-            );
-            
-            const syncPromise = db.collection('sentences').doc('user_data').set({
+            await db.collection('sentences').doc('user_data').set({
                 sentences: sentences,
                 lastUpdated: timestamp,
                 count: sentences.length
             });
 
-            await Promise.race([syncPromise, timeoutPromise]);
-
-            // Verify by loading back
-            const success = await tryLoadFromFirebase(1);
+            console.log('✅ Saved to Firebase successfully');
             
-            if (success) {
-                updateConnectionStatus(true);
-                showNotification('✅ Đồng bộ thành công!', 'success');
-            } else {
-                throw new Error('Sync verification failed');
-            }
-
         } catch (error) {
-            console.error('Sync error:', error);
+            console.error('❌ Save to Firebase error:', error);
             updateConnectionStatus(false);
-            showNotification('❌ Lỗi đồng bộ: ' + error.message, 'error');
-        } finally {
-            syncButton.innerHTML = originalContent;
-            syncButton.disabled = false;
         }
     }
 
-    // Load data from Firebase - improved version
+    // Thêm câu mới trực tiếp lên Firebase
+    async function addNewSentenceToFirebase(english = '', vietnamese = '') {
+        try {
+            const currentSentences = getAllSentences();
+            const newSentence = { english, vietnamese };
+            const updatedSentences = [...currentSentences, newSentence];
+
+            await db.collection('sentences').doc('user_data').set({
+                sentences: updatedSentences,
+                lastUpdated: new Date(),
+                count: updatedSentences.length
+            });
+
+        } catch (error) {
+            console.error('❌ Add sentence error:', error);
+            showNotification('❌ Lỗi thêm câu mới', 'error');
+        }
+    }
+
+    // Xóa câu trực tiếp trên Firebase
+    async function deleteSentenceFromFirebase(index) {
+        try {
+            const currentSentences = getAllSentences();
+            const updatedSentences = currentSentences.filter((_, i) => i !== index);
+
+            await db.collection('sentences').doc('user_data').set({
+                sentences: updatedSentences,
+                lastUpdated: new Date(),
+                count: updatedSentences.length
+            });
+
+        } catch (error) {
+            console.error('❌ Delete sentence error:', error);
+            showNotification('❌ Lỗi xóa câu', 'error');
+        }
+    }
+
+    // Cập nhật câu trực tiếp trên Firebase
+    async function updateSentenceInFirebase(index, english, vietnamese) {
+        try {
+            const currentSentences = getAllSentences();
+            if (index >= 0 && index < currentSentences.length) {
+                currentSentences[index] = { english, vietnamese };
+
+                await db.collection('sentences').doc('user_data').set({
+                    sentences: currentSentences,
+                    lastUpdated: new Date(),
+                    count: currentSentences.length
+                });
+            }
+
+        } catch (error) {
+            console.error('❌ Update sentence error:', error);
+        }
+    }
+
+    // Load data từ Firebase (chỉ dùng 1 lần khi khởi tạo)
     async function loadFromFirebase() {
         try {
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Load timeout')), 8000)
-            );
+            const doc = await db.collection('sentences').doc('user_data').get();
             
-            const loadPromise = db.collection('sentences').doc('user_data').get();
-            const doc = await Promise.race([loadPromise, timeoutPromise]);
-
             if (doc.exists) {
                 const data = doc.data();
                 if (data.sentences && Array.isArray(data.sentences)) {
                     loadSentencesToContainer(data.sentences);
-                    showNotification(`📥 Đã tải ${data.sentences.length} câu từ cloud`, 'info');
+                    console.log(`📥 Loaded ${data.sentences.length} sentences from Firebase`);
                     return true;
                 }
             }
             return false;
         } catch (error) {
-            console.error('Load from Firebase error:', error);
-            showNotification('❌ Không thể tải dữ liệu từ cloud', 'error');
+            console.error('❌ Load from Firebase error:', error);
             return false;
         }
     }
@@ -933,7 +929,7 @@
         }, 3000);
     }
 
-    // Import/Export Functions
+    // Import/Export Functions (giữ nguyên)
     function showImportModal() {
         document.getElementById('import-modal').style.display = 'block';
     }
@@ -954,7 +950,7 @@
         }
     }
 
-    function importFromJSON() {
+    async function importFromJSON() {
         const jsonInput = document.getElementById('json-input').value.trim();
 
         if (!jsonInput) {
@@ -981,16 +977,19 @@
             const confirmImport = confirm(`Bạn có muốn nhập ${sentences.length} câu không?\nDữ liệu hiện tại sẽ được thay thế.`);
 
             if (confirmImport) {
-                loadSentencesToContainer(sentences);
+                // Import trực tiếp lên Firebase
+                await db.collection('sentences').doc('user_data').set({
+                    sentences: sentences,
+                    lastUpdated: new Date(),
+                    count: sentences.length
+                });
+
                 closeImportModal();
                 showNotification(`✅ Đã nhập thành công ${sentences.length} câu!`, 'success');
-
-                // Auto save to localStorage
-                saveToLocalStorage();
             }
 
         } catch (error) {
-            showNotification('❌ Lỗi định dạng JSON: ' + error.message, 'error');
+            showNotification('❌ Lỗi: ' + error.message, 'error');
         }
     }
 
@@ -1017,15 +1016,16 @@
         const container = document.getElementById('sentences-container');
         container.innerHTML = '';
 
-        sentences.forEach(sentence => {
-            const newCard = createSentenceCard(sentence.english, sentence.vietnamese);
+        sentences.forEach((sentence, index) => {
+            const newCard = createSentenceCard(sentence.english, sentence.vietnamese, index);
             container.appendChild(newCard);
         });
     }
 
-    function createSentenceCard(englishText = '', vietnameseText = '') {
+    function createSentenceCard(englishText = '', vietnameseText = '', index = -1) {
         const newCard = document.createElement('div');
         newCard.className = 'sentence-card new-card';
+        newCard.dataset.index = index;
 
         newCard.innerHTML = `
             <div class="english-line">
@@ -1043,6 +1043,28 @@
         // Setup placeholder handling
         handlePlaceholder(newCard.querySelector('.english-text'));
         handlePlaceholder(newCard.querySelector('.vietnamese-text'));
+
+        // Thêm event listener cho cập nhật real-time
+        const englishInput = newCard.querySelector('.english-text');
+        const vietnameseInput = newCard.querySelector('.vietnamese-text');
+
+        let updateTimeout;
+        const handleUpdate = () => {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                const cardIndex = parseInt(newCard.dataset.index);
+                if (cardIndex >= 0) {
+                    updateSentenceInFirebase(
+                        cardIndex,
+                        englishInput.textContent.trim(),
+                        vietnameseInput.textContent.trim()
+                    );
+                }
+            }, 1000); // Đợi 1 giây sau khi user ngừng gõ
+        };
+
+        englishInput.addEventListener('input', handleUpdate);
+        vietnameseInput.addEventListener('input', handleUpdate);
 
         return newCard;
     }
@@ -1118,6 +1140,11 @@
 
         // Chuẩn bị bài kiểm tra
         prepareTest(sentences);
+        
+        // Initialize textarea after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            initializeTextareaResize();
+        }, 100);
     }
 
     function getAllSentences() {
@@ -1155,68 +1182,88 @@
     }
 
     function updateTestQuestion() {
-    const questionNumber = document.getElementById('question-number');
-    const currentQuestionEl = document.getElementById('current-question');
-    const answerInput = document.getElementById('answer-input');
-    const progressFill = document.getElementById('progress-fill');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
-    const submitButton = document.getElementById('submit-button');
+        const questionNumber = document.getElementById('question-number');
+        const currentQuestionEl = document.getElementById('current-question');
+        const answerInput = document.getElementById('answer-input');
+        const progressFill = document.getElementById('progress-fill');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const submitButton = document.getElementById('submit-button');
 
-    questionNumber.textContent = currentQuestionIndex + 1;
-    currentQuestionEl.textContent = currentQuestionIndex + 1;
-    
-    // Load saved answer if exists
-    answerInput.value = userAnswers[currentQuestionIndex] || '';
-    
-    // Auto-resize after setting value
-    setTimeout(() => {
-        autoResizeTextarea(answerInput);
-    }, 10);
+        questionNumber.textContent = currentQuestionIndex + 1;
+        currentQuestionEl.textContent = currentQuestionIndex + 1;
+        
+        // Load saved answer if exists
+        answerInput.value = userAnswers[currentQuestionIndex] || '';
+        
+        // Auto-resize after setting value
+        setTimeout(() => {
+            autoResizeTextarea(answerInput);
+        }, 10);
 
-    // Update progress
-    const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
-    progressFill.style.width = progress + '%';
+        // Update progress
+        const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
+        progressFill.style.width = progress + '%';
 
-    // Update navigation buttons
-    prevButton.disabled = currentQuestionIndex === 0;
-    
-    if (currentQuestionIndex === testQuestions.length - 1) {
-        nextButton.style.display = 'none';
-        submitButton.style.display = 'inline-block';
-    } else {
-        nextButton.style.display = 'inline-block';
-        submitButton.style.display = 'none';
+        // Update navigation buttons
+        prevButton.disabled = currentQuestionIndex === 0;
+        
+        if (currentQuestionIndex === testQuestions.length - 1) {
+            nextButton.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+        } else {
+            nextButton.style.display = 'inline-block';
+            submitButton.style.display = 'none';
+        }
     }
-}
 
     function playTestAudio() {
-        const question = testQuestions[currentQuestionIndex];
-        const button = document.querySelector('.test-play-button');
-        speakEnglishText(question.english, button);
+        if (testQuestions.length > 0) {
+            const currentQuestion = testQuestions[currentQuestionIndex];
+            const textarea = document.getElementById('answer-input');
+            const playButton = document.querySelector('.test-play-button');
+            
+            // Store current focus state
+            const wasFocused = document.activeElement === textarea;
+            const cursorPosition = textarea.selectionStart;
+            
+            // Prevent default behavior that might dismiss keyboard
+            event?.preventDefault();
+            
+            // Sử dụng speakEnglishText thay vì speakText
+            speakEnglishText(currentQuestion.english, playButton);
+            
+            // Restore focus after a delay
+            setTimeout(() => {
+                if (wasFocused) {
+                    textarea.focus();
+                    textarea.setSelectionRange(cursorPosition, cursorPosition);
+                }
+            }, 100);
+        }
     }
 
     function previousQuestion() {
-    // Save current answer
-    const answerInput = document.getElementById('answer-input');
-    userAnswers[currentQuestionIndex] = answerInput.value.trim();
+        // Save current answer
+        const answerInput = document.getElementById('answer-input');
+        userAnswers[currentQuestionIndex] = answerInput.value.trim();
 
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        updateTestQuestion();
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            updateTestQuestion();
+        }
     }
-}
 
     function nextQuestion() {
-    // Save current answer
-    const answerInput = document.getElementById('answer-input');
-    userAnswers[currentQuestionIndex] = answerInput.value.trim();
+        // Save current answer
+        const answerInput = document.getElementById('answer-input');
+        userAnswers[currentQuestionIndex] = answerInput.value.trim();
 
-    if (currentQuestionIndex < testQuestions.length - 1) {
-        currentQuestionIndex++;
-        updateTestQuestion();
+        if (currentQuestionIndex < testQuestions.length - 1) {
+            currentQuestionIndex++;
+            updateTestQuestion();
+        }
     }
-}
 
     function submitTest() {
         // Lưu câu trả lời cuối cùng
@@ -1365,11 +1412,12 @@
         showTestMode();
     }
 
-    // Thêm câu mới
-    function addNewSentence() {
+    // Thêm câu mới (sử dụng Firebase)
+    async function addNewSentence() {
         const container = document.getElementById('sentences-container');
-        const newCard = createSentenceCard();
-
+        
+        // Tạm thời thêm card trống để user thấy
+        const newCard = createSentenceCard('', '', getAllSentences().length);
         container.appendChild(newCard);
 
         // Cuộn đến thẻ mới và focus vào ô tiếng Anh
@@ -1382,17 +1430,21 @@
             const englishInput = newCard.querySelector('.english-text');
             englishInput.focus();
         }, 100);
+
+        // Thêm vào Firebase
+        await addNewSentenceToFirebase('', '');
     }
 
-    // Xóa câu
-    function deleteSentence(button) {
+    // Xóa câu (sử dụng Firebase)
+    async function deleteSentence(button) {
         if (confirm('Bạn có chắc muốn xóa câu này không?')) {
             const card = button.parentElement;
+            const index = parseInt(card.dataset.index);
+            
             card.style.animation = 'slideOut 0.3s ease';
 
-            setTimeout(() => {
-                card.remove();
-                scheduleAutoSave(); // Auto save after delete
+            setTimeout(async () => {
+                await deleteSentenceFromFirebase(index);
             }, 300);
         }
     }
@@ -1421,7 +1473,7 @@
         }
     }
 
-    // Local Storage functions
+    // Local Storage functions (chỉ dùng để backup)
     function saveToLocalStorage() {
         const sentences = getAllSentences();
         localStorage.setItem('englishLearningData', JSON.stringify(sentences));
@@ -1441,20 +1493,6 @@
             }
         }
         return false;
-    }
-
-    // Thêm auto-save với debounce
-    let autoSaveTimeout;
-    function scheduleAutoSave() {
-        clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(() => {
-            saveToLocalStorage();
-            
-            // Nếu đã kết nối Firebase, tự động sync
-            if (firebaseConnected && getAllSentences().length > 0) {
-                syncWithFirebase();
-            }
-        }, 2000);
     }
 
     // Thêm câu mẫu để demo
@@ -1482,383 +1520,296 @@
             }
         ];
 
-        loadSentencesToContainer(sampleSentences);
+        return sampleSentences;
     }
 
-    // Hàm khởi tạo app - improved version
-    async function initializeApp() {
-        console.log('🚀 Initializing app...');
-        
-        // Load voices khi trang web được tải
-        speechSynthesis.getVoices();
-        
-        // Đảm bảo voices được load (một số browser cần thời gian)
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = () => {
-                speechSynthesis.getVoices();
-            };
-        }
+   // Hàm khởi tạo app - improved version
+   async function initializeApp() {
+       console.log('🚀 Initializing app...');
+       
+       // Load voices khi trang web được tải
+       speechSynthesis.getVoices();
+       
+       // Đảm bảo voices được load (một số browser cần thời gian)
+       if (speechSynthesis.onvoiceschanged !== undefined) {
+           speechSynthesis.onvoiceschanged = () => {
+               speechSynthesis.getVoices();
+           };
+       }
 
-        // Thử tải từ Firebase trước
-        console.log('⏳ Trying to load from Firebase...');
-        const firebaseLoadSuccess = await tryLoadFromFirebase();
-        
-        if (firebaseLoadSuccess) {
-            console.log('✅ Loaded from Firebase successfully');
-            showNotification('📥 Đã tải dữ liệu từ cloud', 'success');
-        } else {
-            console.log('❌ Failed to load from Firebase, trying localStorage...');
-            
-            // Nếu Firebase thất bại, thử localStorage
-            const localStorageLoadSuccess = loadFromLocalStorage();
-            
-            if (localStorageLoadSuccess) {
-                console.log('✅ Loaded from localStorage');
-                showNotification('📱 Đã tải dữ liệu từ bộ nhớ máy', 'info');
-                
-                // Thử sync với Firebase sau khi load từ localStorage
-                setTimeout(retryFirebaseConnection, 3000);
-            } else {
-                console.log('ℹ️ No saved data found, loading sample sentences');
-                addSampleSentences();
-                showNotification('🎯 Đã tải dữ liệu mẫu', 'info');
-            }
-        }
-    }
-
-    // Event Listeners
-    document.addEventListener('keydown', function (e) {
-        if (e.ctrlKey && e.key === 'b') {
-            e.preventDefault();
-
-            const selection = window.getSelection();
-            if (selection.toString().length > 0) {
-                document.execCommand('bold');
-            }
-        }
-
-        // Enter để chuyển câu tiếp theo trong test
-        if (e.key === 'Enter' && document.getElementById('test-container').style.display === 'block') {
-            e.preventDefault();
-            if (currentQuestionIndex < testQuestions.length - 1) {
-                nextQuestion();
-            } else {
-                submitTest();
-            }
-        }
-
-        // Keyboard shortcuts
-        if (e.ctrlKey && e.key === 't') {
-            e.preventDefault();
-            showTestMode();
-        }
-
-        if (e.ctrlKey && e.key === 'p') {
-            e.preventDefault();
-            showPracticeMode();
-        }
-
-        if (e.ctrlKey && e.key === 'n') {
-            e.preventDefault();
-            if (document.getElementById('practice-container').style.display !== 'none') {
-                addNewSentence();
-            }
-        }
-
-        // Import/Export shortcuts
-        if (e.ctrlKey && e.key === 'i') {
-            e.preventDefault();
-            showImportModal();
-        }
-
-        if (e.ctrlKey && e.key === 'e') {
-            e.preventDefault();
-            exportToJSON();
-        }
-
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            syncWithFirebase();
-        }
-    });
-
-    // Auto-save khi người dùng nhập liệu - improved version
-    document.addEventListener('input', function (e) {
-        if (e.target.contentEditable === 'true') {
-            scheduleAutoSave();
-        }
-    });
-
-    // Xử lý paste text
-    document.addEventListener('paste', function (e) {
-        const target = e.target;
-        if (target.contentEditable === 'true') {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-            document.execCommand('insertText', false, text);
-        }
-    });
-
-    // Close modal when clicking outside
-    document.addEventListener('click', function (e) {
-        const modal = document.getElementById('import-modal');
-        if (e.target === modal) {
-            closeImportModal();
-        }
-    });
-
-    // Network status listeners
-    window.addEventListener('online', function() {
-        console.log('🌐 Network back online, retrying Firebase...');
-        retryFirebaseConnection();
-    });
-
-    window.addEventListener('offline', function() {
-        console.log('📵 Network offline');
-        updateConnectionStatus(false);
-    });
-
-    // CSS cho animation slideOut
-    const style = document.createElement('style');
-    style.textContent = `
-       @keyframes slideOut {
-           from {
-               opacity: 1;
-               transform: translateX(0);
+       try {
+           // Thử kết nối Firebase và setup real-time listener
+           console.log('⏳ Setting up Firebase real-time connection...');
+           setupRealtimeListener();
+           
+           // Thử load dữ liệu từ Firebase
+           const firebaseLoadSuccess = await loadFromFirebase();
+           
+           if (firebaseLoadSuccess) {
+               console.log('✅ Loaded from Firebase successfully');
+               showNotification('📥 Đã tải dữ liệu từ cloud', 'success');
+           } else {
+               console.log('❌ No data in Firebase, trying localStorage...');
+               
+               // Nếu Firebase không có dữ liệu, thử localStorage
+               const localStorageLoadSuccess = loadFromLocalStorage();
+               
+               if (localStorageLoadSuccess) {
+                   console.log('✅ Loaded from localStorage');
+                   showNotification('📱 Đã tải dữ liệu từ bộ nhớ máy', 'info');
+                   
+                   // Upload dữ liệu từ localStorage lên Firebase
+                   await saveToFirebase();
+               } else {
+                   console.log('ℹ️ No saved data found, loading sample sentences');
+                   
+                   // Tải câu mẫu lên Firebase
+                   const sampleSentences = addSampleSentences();
+                   await db.collection('sentences').doc('user_data').set({
+                       sentences: sampleSentences,
+                       lastUpdated: new Date(),
+                       count: sampleSentences.length
+                   });
+                   
+                   showNotification('🎯 Đã tải dữ liệu mẫu', 'info');
+               }
            }
-           to {
-               opacity: 0;
-               transform: translateX(-100%);
+           
+       } catch (error) {
+           console.error('❌ Firebase initialization failed:', error);
+           updateConnectionStatus(false);
+           
+           // Fallback sang localStorage
+           const localStorageLoadSuccess = loadFromLocalStorage();
+           if (localStorageLoadSuccess) {
+               showNotification('📱 Đã tải từ bộ nhớ máy (offline)', 'info');
+           } else {
+               loadSentencesToContainer(addSampleSentences());
+               showNotification('🎯 Chế độ offline - dữ liệu mẫu', 'info');
            }
        }
-   `;
-    document.head.appendChild(style);
+   }
 
-    // Khởi tạo khi trang web được tải - improved version
-    document.addEventListener('DOMContentLoaded', initializeApp);
+   // Auto-resize textarea function
+   function autoResizeTextarea(textarea) {
+       textarea.style.height = 'auto';
+       textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+   }
 
-    // Visibility change listener - tự động sync khi user quay lại tab
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden && firebaseConnected) {
-            // Nếu user quay lại tab và Firebase đã kết nối, thử tải dữ liệu mới nhất
-            setTimeout(() => {
-                tryLoadFromFirebase(1);
-            }, 1000);
-        }
-    });
+   // Initialize textarea auto-resize
+   function initializeTextareaResize() {
+       const textarea = document.getElementById('answer-input');
+       if (textarea) {
+           textarea.addEventListener('input', function() {
+               autoResizeTextarea(this);
+           });
+           
+           // Initial resize
+           autoResizeTextarea(textarea);
+       }
+   }
 
-    // Before unload - save data before user leaves
-    window.addEventListener('beforeunload', function(e) {
-        // Lưu vào localStorage trước khi rời khỏi trang
-        saveToLocalStorage();
-        
-        // Nếu có dữ liệu mới và Firebase connected, thử sync nhanh
-        if (firebaseConnected && getAllSentences().length > 0) {
-            // Quick sync without waiting
-            const sentences = getAllSentences();
-            const timestamp = new Date();
-            
-            db.collection('sentences').doc('user_data').set({
-                sentences: sentences,
-                lastUpdated: timestamp,
-                count: sentences.length
-            }).catch(console.error);
-        }
-    });
+   // Event Listeners
+   document.addEventListener('keydown', function (e) {
+       if (e.ctrlKey && e.key === 'b') {
+           e.preventDefault();
 
-    // Service Worker registration để cache app cho offline usage
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            // Tạo một service worker đơn giản
-            const swCode = `
-                const CACHE_NAME = 'english-learning-v1';
-                const urlsToCache = [
-                    '/',
-                    '/style.css',
-                    '/script.js'
-                ];
+           const selection = window.getSelection();
+           if (selection.toString().length > 0) {
+               document.execCommand('bold');
+           }
+       }
 
-                self.addEventListener('install', function(event) {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                return cache.addAll(urlsToCache);
-                            })
-                    );
-                });
+       // Enter để chuyển câu tiếp theo trong test
+       if (e.key === 'Enter' && document.getElementById('test-container').style.display === 'block') {
+           e.preventDefault();
+           if (currentQuestionIndex < testQuestions.length - 1) {
+               nextQuestion();
+           } else {
+               submitTest();
+           }
+       }
 
-                self.addEventListener('fetch', function(event) {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(function(response) {
-                                if (response) {
-                                    return response;
-                                }
-                                return fetch(event.request);
-                            }
-                        )
-                    );
-                });
-            `;
-            
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            
-            navigator.serviceWorker.register(swUrl)
-                .then(function(registration) {
-                    console.log('✅ Service Worker registered successfully');
-                })
-                .catch(function(error) {
-                    console.log('❌ Service Worker registration failed:', error);
-                });
-        });
-    }
+       // Keyboard shortcuts
+       if (e.ctrlKey && e.key === 't') {
+           e.preventDefault();
+           showTestMode();
+       }
 
-    // Performance optimization - lazy loading cho large datasets
-    function optimizePerformance() {
-        // Nếu có quá nhiều câu (>100), chỉ hiển thị 50 câu đầu
-        const allCards = document.querySelectorAll('#sentences-container .sentence-card');
-        if (allCards.length > 100) {
-            allCards.forEach((card, index) => {
-                if (index >= 50) {
-                    card.style.display = 'none';
-                }
-            });
-            
-            // Thêm nút "Load more"
-            const loadMoreBtn = document.createElement('button');
-            loadMoreBtn.className = 'add-button';
-            loadMoreBtn.innerHTML = '📄 Hiển thị thêm câu';
-            loadMoreBtn.onclick = function() {
-                const hiddenCards = document.querySelectorAll('#sentences-container .sentence-card[style*="display: none"]');
-                for (let i = 0; i < Math.min(25, hiddenCards.length); i++) {
-                    hiddenCards[i].style.display = 'block';
-                }
-                
-                if (hiddenCards.length <= 25) {
-                    loadMoreBtn.remove();
-                }
-            };
-            
-            document.getElementById('sentences-container').appendChild(loadMoreBtn);
-        }
-    }
+       if (e.ctrlKey && e.key === 'p') {
+           e.preventDefault();
+           showPracticeMode();
+       }
 
-    // Error handling và logging
-    window.addEventListener('error', function(e) {
-        console.error('❌ JavaScript Error:', e.error);
-        showNotification('⚠️ Đã xảy ra lỗi, vui lòng tải lại trang', 'error');
-    });
+       if (e.ctrlKey && e.key === 'n') {
+           e.preventDefault();
+           if (document.getElementById('practice-container').style.display !== 'none') {
+               addNewSentence();
+           }
+       }
 
-    window.addEventListener('unhandledrejection', function(e) {
-        console.error('❌ Unhandled Promise Rejection:', e.reason);
-        // Không hiển thị notification cho promise rejection để tránh spam
-    });
+       // Import/Export shortcuts
+       if (e.ctrlKey && e.key === 'i') {
+           e.preventDefault();
+           showImportModal();
+       }
 
-    // Health check function
-    function performHealthCheck() {
-        const healthStatus = {
-            localStorage: false,
-            firebase: firebaseConnected,
-            speechSynthesis: 'speechSynthesis' in window,
-            dataIntegrity: false
-        };
+       if (e.ctrlKey && e.key === 'e') {
+           e.preventDefault();
+           exportToJSON();
+       }
+   });
 
-        // Check localStorage
-        try {
-            localStorage.setItem('health-check', 'test');
-            localStorage.removeItem('health-check');
-            healthStatus.localStorage = true;
-        } catch (e) {
-            healthStatus.localStorage = false;
-        }
+   // Xử lý paste text
+   document.addEventListener('paste', function (e) {
+       const target = e.target;
+       if (target.contentEditable === 'true') {
+           e.preventDefault();
+           const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+           document.execCommand('insertText', false, text);
+       }
+   });
 
-        // Check data integrity
-        const sentences = getAllSentences();
-        healthStatus.dataIntegrity = sentences.length > 0;
+   // Close modal when clicking outside
+   document.addEventListener('click', function (e) {
+       const modal = document.getElementById('import-modal');
+       if (e.target === modal) {
+           closeImportModal();
+       }
+   });
 
-        console.log('🏥 Health Check:', healthStatus);
-        
-        return healthStatus;
-    }
+   // Network status listeners
+   window.addEventListener('online', function() {
+       console.log('🌐 Network back online, setting up Firebase...');
+       setupRealtimeListener();
+   });
 
-    // Chạy health check mỗi 5 phút
-    setInterval(performHealthCheck, 5 * 60 * 1000);
-    
+   window.addEventListener('offline', function() {
+       console.log('📵 Network offline');
+       updateConnectionStatus(false);
+   });
 
-    // Auto-resize textarea function
-function autoResizeTextarea(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-}
+   // CSS cho animation slideOut
+   const style = document.createElement('style');
+   style.textContent = `
+      @keyframes slideIn {
+          from {
+              opacity: 0;
+              transform: translateX(100%);
+          }
+          to {
+              opacity: 1;
+              transform: translateX(0);
+          }
+      }
+      
+      @keyframes slideOut {
+          from {
+              opacity: 1;
+              transform: translateX(0);
+          }
+          to {
+              opacity: 0;
+              transform: translateX(-100%);
+          }
+      }
+      
+      .status-indicator {
+          padding: 5px 10px;
+          border-radius: 15px;
+          font-size: 12px;
+          font-weight: bold;
+          display: inline-block;
+          margin-left: 10px;
+      }
+      
+      .status-connected {
+          background: linear-gradient(45deg, #27ae60, #2ecc71);
+          color: white;
+      }
+      
+      .status-disconnected {
+          background: linear-gradient(45deg, #e74c3c, #c0392b);
+          color: white;
+      }
+      
+      .status-syncing {
+          background: linear-gradient(45deg, #f39c12, #e67e22);
+          color: white;
+      }
+  `;
+   document.head.appendChild(style);
 
-// Initialize textarea auto-resize
-function initializeTextareaResize() {
-    const textarea = document.getElementById('answer-input');
-    if (textarea) {
-        textarea.addEventListener('input', function() {
-            autoResizeTextarea(this);
-        });
-        
-        // Initial resize
-        autoResizeTextarea(textarea);
-    }
-}
+   // Khởi tạo khi trang web được tải
+   document.addEventListener('DOMContentLoaded', initializeApp);
 
-// Modified playTestAudio function to prevent keyboard dismissal
-function playTestAudio() {
-    if (testQuestions.length > 0) {
-        const currentQuestion = testQuestions[currentQuestionIndex];
-        const textarea = document.getElementById('answer-input');
-        const playButton = document.querySelector('.test-play-button'); // Lấy button element
-        
-        // Store current focus state
-        const wasFocused = document.activeElement === textarea;
-        const cursorPosition = textarea.selectionStart;
-        
-        // Prevent default behavior that might dismiss keyboard
-        event?.preventDefault();
-        
-        // Sử dụng speakEnglishText thay vì speakText
-        speakEnglishText(currentQuestion.english, playButton);
-        
-        // Restore focus after a delay
-        setTimeout(() => {
-            if (wasFocused) {
-                textarea.focus();
-                textarea.setSelectionRange(cursorPosition, cursorPosition);
-            }
-        }, 100);
-    }
-}
+   // Visibility change listener - kiểm tra kết nối khi user quay lại tab
+   document.addEventListener('visibilitychange', function() {
+       if (!document.hidden && !firebaseConnected) {
+           console.log('👀 User returned to tab, checking Firebase connection...');
+           setupRealtimeListener();
+       }
+   });
 
-// Update the showTestMode function to initialize textarea
-function showTestMode() {
-    const sentences = getAllSentences(); // Thêm dòng này để lấy danh sách câu
-    
-    if (sentences.length < 5) {
-        showNotification('❌ Cần ít nhất 5 câu để bắt đầu kiểm tra. Vui lòng thêm thêm câu!', 'error');
-        return;
-    }
+   // Before unload - save data before user leaves (backup)
+   window.addEventListener('beforeunload', function(e) {
+       // Lưu vào localStorage để backup
+       saveToLocalStorage();
+       
+       // Cleanup real-time listener
+       if (unsubscribe) {
+           unsubscribe();
+       }
+   });
 
-    document.getElementById('practice-container').style.display = 'none';
-    document.getElementById('test-container').style.display = 'block';
-    document.getElementById('results-container').style.display = 'none';
+   // Error handling và logging
+   window.addEventListener('error', function(e) {
+       console.error('❌ JavaScript Error:', e.error);
+       showNotification('⚠️ Đã xảy ra lỗi, vui lòng tải lại trang', 'error');
+   });
 
-    // Cập nhật active button
-    document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+   window.addEventListener('unhandledrejection', function(e) {
+       console.error('❌ Unhandled Promise Rejection:', e.reason);
+       // Không hiển thị notification cho promise rejection để tránh spam
+   });
 
-    // Chuẩn bị bài kiểm tra
-    prepareTest(sentences);
-    
-    // Initialize textarea after a short delay to ensure DOM is ready
-    setTimeout(() => {
-        initializeTextareaResize();
-    }, 100);
-}
+   // Health check function
+   function performHealthCheck() {
+       const healthStatus = {
+           localStorage: false,
+           firebase: firebaseConnected,
+           speechSynthesis: 'speechSynthesis' in window,
+           dataIntegrity: false,
+           realtimeListener: unsubscribe !== null
+       };
+
+       // Check localStorage
+       try {
+           localStorage.setItem('health-check', 'test');
+           localStorage.removeItem('health-check');
+           healthStatus.localStorage = true;
+       } catch (e) {
+           healthStatus.localStorage = false;
+       }
+
+       // Check data integrity
+       const sentences = getAllSentences();
+       healthStatus.dataIntegrity = sentences.length > 0;
+
+       console.log('🏥 Health Check:', healthStatus);
+       
+       // Nếu mất kết nối Firebase, thử kết nối lại
+       if (!firebaseConnected) {
+           console.log('🔄 Firebase disconnected, attempting reconnection...');
+           setupRealtimeListener();
+       }
+
+       return healthStatus;
+   }
+
+   // Chạy health check mỗi 30 giây
+   setInterval(performHealthCheck, 30 * 1000);
 </script>
-
    
 </body>
 
