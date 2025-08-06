@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Nghe Tiếng Anh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .mode-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .mode-button.active {
+            background: linear-gradient(45deg, #e67e22, #d35400);
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .add-button,
+        .import-button,
+        .export-button,
+        .sync-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .import-button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+
+        .export-button {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+        }
+
+        .sync-button {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+
+        .add-button:hover,
+        .import-button:hover,
+        .export-button:hover,
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .sentence-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .sentence-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .english-line {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .english-text {
+            flex: 1;
+            font-size: 18px;
+            color: #2c3e50;
+            line-height: 1.5;
+            min-height: 25px;
+            outline: none;
+            border: none;
+            background: transparent;
+            font-weight: 500;
+        }
+
+        .english-text:focus {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            transform: scale(1.1);
+        }
+
+        .vietnamese-text {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.5;
+            min-height: 22px;
+            outline: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-style: italic;
+        }
+
+        .vietnamese-text:focus {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .delete-button {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .delete-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 25px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .status-connected {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+
+        .status-disconnected {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .status-syncing {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+
+        /* Import modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .json-input {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            outline: none;
+            resize: vertical;
+        }
+
+        .json-input:focus {
+            border-color: #3498db;
+        }
+
+        /* Test Mode Styles */
+        .test-container {
+            display: none;
+        }
+
+        .test-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .test-progress {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .test-question {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .question-number {
+            font-size: 18px;
+            color: #3498db;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .test-play-button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .test-play-button:hover {
+            transform: scale(1.1);
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .answer-input:focus {
+            border-color: #3498db;
+        }
+
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #7f8c8d, #95a5a6);
+            transform: translateY(-1px);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-button {
+            background: linear-gradient(45deg, #e67e22, #d35400);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Results Styles */
+        .results-container {
+            display: none;
+        }
+
+        .results-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .score-text {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .result-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-correct {
+            border-left: 5px solid #27ae60;
+        }
+
+        .result-incorrect {
+            border-left: 5px solid #e74c3c;
+        }
+
+        .result-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .result-answer {
+            margin-bottom: 5px;
+        }
+
+        .user-answer {
+            color: #e74c3c;
+            font-style: italic;
+        }
+
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .bold-text {
+            font-weight: bold !important;
+        }
+
+        /* Animation cho card mới */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-card {
+            animation: slideIn 0.5s ease;
+        }
+
+        /* Loading animation */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .mode-buttons,
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sentence-card {
+                padding: 20px;
+            }
+
+            .english-line {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .play-button {
+                align-self: flex-end;
+                width: 40px;
+                height: 40px;
+            }
+
+            .test-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Status Indicator -->
+    <div id="status-indicator" class="status-indicator status-disconnected">
+        🔴 Không kết nối
+    </div>
+
+    <div class="container">
+        <h1>🎧 Luyện Nghe Tiếng Anh</h1>
+
+        <div class="mode-buttons">
+            <button class="mode-button active" onclick="showPracticeMode()">
+                📝 Luyện Tập
+            </button>
+            <button class="mode-button" onclick="showTestMode()">
+                🎯 Kiểm Tra
+            </button>
+        </div>
+
+        <!-- Practice Mode -->
+        <div id="practice-container">
+            <div class="instructions">
+                💡 Nhấn <strong>Ctrl + B</strong> để in đậm văn bản đã chọn
+            </div>
+
+            <div class="control-buttons">
+                <button class="add-button" onclick="addNewSentence()">
+                    ➕ Thêm Câu
+                </button>
+                <button class="import-button" onclick="showImportModal()">
+                    📁 Nhập JSON
+                </button>
+                <button class="export-button" onclick="exportToJSON()">
+                    💾 Xuất JSON
+                </button>
+                <button class="sync-button" onclick="syncWithFirebase()">
+                    ☁️ Đồng Bộ
+                </button>
+            </div>
+
+            <div id="sentences-container">
+                <!-- Câu mẫu sẽ được thêm bằng JavaScript -->
+            </div>
+        </div>
+
+        <!-- Test Mode -->
+        <div id="test-container" class="test-container">
+            <div class="test-header">
+                <div class="test-progress">
+                    Câu <span id="current-question">1</span> / <span id="total-questions">20</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="test-question">
+                <div class="question-number">Câu <span id="question-number">1</span></div>
+                <button class="test-play-button" onclick="playTestAudio()">
+                    🔊
+                </button>
+                <input type="text" class="answer-input" id="answer-input"
+                    placeholder="Nhập câu tiếng Anh bạn nghe được...">
+
+                <div class="test-navigation">
+                    <button class="nav-button" id="prev-button" onclick="previousQuestion()" disabled>
+                        ← Câu trước
+                    </button>
+                    <button class="nav-button" id="next-button" onclick="nextQuestion()">
+                        Câu tiếp →
+                    </button>
+                    <button class="submit-button" id="submit-button" onclick="submitTest()" style="display: none;">
+                        📝 Nộp Bài
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results-container" class="results-container">
+            <div class="results-header">
+                <div class="score-display" id="score-display">0/20</div>
+                <div class="score-text">Điểm số của bạn</div>
+                <button class="mode-button" onclick="showPracticeMode()" style="margin-top: 20px;">
+                    🔄 Quay lại luyện tập
+                </button>
+                <button class="mode-button" onclick="retakeTest()" style="margin-top: 20px;">
+                    🎯 Làm lại kiểm tra
+                </button>
+            </div>
+            <div id="results-details"></div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeImportModal()">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">📁 Nhập Dữ Liệu JSON</h2>
+            <p style="margin-bottom: 15px; color: #7f8c8d;">Dán nội dung file JSON hoặc tải lên file:</p>
+
+            <textarea id="json-input" class="json-input" placeholder='[
+  {
+    "english": "Hello, how are you?",
+    "vietnamese": "Xin chào, bạn khỏe không?"
+  },
+  {
+    "english": "What time is it?",
+    "vietnamese": "Mấy giờ rồi?"
+  }
+]'></textarea>
+
+            <div style="margin: 20px 0; text-align: center;">
+                <strong>HOẶC</strong>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <input type="file" id="json-file-input" accept=".json" style="display: none;"
+                    onchange="loadJSONFile(this)">
+                <button onclick="document.getElementById('json-file-input').click()" class="import-button">
+                    📂 Chọn File JSON
+                </button>
+            </div>
+
+            <div style="text-align: center; gap: 10px; display: flex; justify-content: center;">
+                <button onclick="importFromJSON()" class="add-button">
+                    ✅ Nhập Dữ Liệu
+                </button>
+                <button onclick="closeImportModal()" class="nav-button">
+                    ❌ Hủy
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
+        authDomain: "hz-listening.firebaseapp.com",
+        projectId: "hz-listening",
+        storageBucket: "hz-listening.firebasestorage.app",
+        messagingSenderId: "1044959632237",
+        appId: "1:1044959632237:web:d2fcc1294a83ca5349d864",
+        measurementId: "G-SEY2ERMPDW"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let testQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let firebaseConnected = false;
+
+    // Firebase connection status
+    function updateConnectionStatus(connected) {
+        firebaseConnected = connected;
+        const indicator = document.getElementById('status-indicator');
+
+        if (connected) {
+            indicator.className = 'status-indicator status-connected';
+            indicator.innerHTML = '🟢 Đã kết nối';
+        } else {
+            indicator.className = 'status-indicator status-disconnected';
+            indicator.innerHTML = '🔴 Không kết nối';
+        }
+    }
+
+    // Hàm thử tải từ Firebase với timeout và retry
+    async function tryLoadFromFirebase(maxRetries = 3) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`🔄 Firebase connection attempt ${attempt}/${maxRetries}`);
+                
+                // Set timeout cho việc kết nối Firebase
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Firebase timeout')), 8000)
+                );
+                
+                const loadPromise = db.collection('sentences').doc('user_data').get();
+                
+                // Race between timeout and actual load
+                const doc = await Promise.race([loadPromise, timeoutPromise]);
+                
+                updateConnectionStatus(true);
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.sentences && Array.isArray(data.sentences) && data.sentences.length > 0) {
+                        loadSentencesToContainer(data.sentences);
+                        console.log(`✅ Loaded ${data.sentences.length} sentences from Firebase`);
+                        return true;
+                    }
+                }
+                
+                console.log('ℹ️ Firebase connected but no data found');
+                return false;
+                
+            } catch (error) {
+                console.error(`❌ Firebase attempt ${attempt} failed:`, error.message);
+                
+                if (attempt === maxRetries) {
+                    updateConnectionStatus(false);
+                    return false;
+                }
+                
+                // Đợi trước khi thử lại
+                await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+            }
+        }
+        
+        return false;
+    }
+
+    // Hàm thử kết nối lại Firebase
+    async function retryFirebaseConnection() {
+        console.log('🔄 Retrying Firebase connection...');
+        
+        const success = await tryLoadFromFirebase(2);
+        
+        if (success) {
+            showNotification('🔄 Đã đồng bộ với cloud', 'success');
+        } else {
+            // Thử lại sau 30 giây
+            setTimeout(retryFirebaseConnection, 30000);
+        }
+    }
+
+    // Sync with Firebase - improved version
+    async function syncWithFirebase() {
+        const syncButton = document.querySelector('.sync-button');
+        const originalContent = syncButton.innerHTML;
+
+        syncButton.innerHTML = '<div class="loading">⚙️</div> Đang đồng bộ...';
+        syncButton.disabled = true;
+
+        const indicator = document.getElementById('status-indicator');
+        indicator.className = 'status-indicator status-syncing';
+        indicator.innerHTML = '🟡 Đang đồng bộ...';
+
+        try {
+            const sentences = getAllSentences();
+            const timestamp = new Date();
+
+            // Set timeout cho sync
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Sync timeout')), 10000)
+            );
+            
+            const syncPromise = db.collection('sentences').doc('user_data').set({
+                sentences: sentences,
+                lastUpdated: timestamp,
+                count: sentences.length
+            });
+
+            await Promise.race([syncPromise, timeoutPromise]);
+
+            // Verify by loading back
+            const success = await tryLoadFromFirebase(1);
+            
+            if (success) {
+                updateConnectionStatus(true);
+                showNotification('✅ Đồng bộ thành công!', 'success');
+            } else {
+                throw new Error('Sync verification failed');
+            }
+
+        } catch (error) {
+            console.error('Sync error:', error);
+            updateConnectionStatus(false);
+            showNotification('❌ Lỗi đồng bộ: ' + error.message, 'error');
+        } finally {
+            syncButton.innerHTML = originalContent;
+            syncButton.disabled = false;
+        }
+    }
+
+    // Load data from Firebase - improved version
+    async function loadFromFirebase() {
+        try {
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Load timeout')), 8000)
+            );
+            
+            const loadPromise = db.collection('sentences').doc('user_data').get();
+            const doc = await Promise.race([loadPromise, timeoutPromise]);
+
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.sentences && Array.isArray(data.sentences)) {
+                    loadSentencesToContainer(data.sentences);
+                    showNotification(`📥 Đã tải ${data.sentences.length} câu từ cloud`, 'info');
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.error('Load from Firebase error:', error);
+            showNotification('❌ Không thể tải dữ liệu từ cloud', 'error');
+            return false;
+        }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            z-index: 1001;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        `;
+
+        switch (type) {
+            case 'success':
+                notification.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+                break;
+            case 'error':
+                notification.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
+                break;
+            case 'info':
+                notification.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+                break;
+        }
+
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // Import/Export Functions
+    function showImportModal() {
+        document.getElementById('import-modal').style.display = 'block';
+    }
+
+    function closeImportModal() {
+        document.getElementById('import-modal').style.display = 'none';
+        document.getElementById('json-input').value = '';
+    }
+
+    function loadJSONFile(input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('json-input').value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+    }
+
+    function importFromJSON() {
+        const jsonInput = document.getElementById('json-input').value.trim();
+
+        if (!jsonInput) {
+            showNotification('❌ Vui lòng nhập nội dung JSON', 'error');
+            return;
+        }
+
+        try {
+            const sentences = JSON.parse(jsonInput);
+
+            if (!Array.isArray(sentences)) {
+                throw new Error('Dữ liệu phải là một mảng các câu');
+            }
+
+            // Validate structure
+            for (let i = 0; i < sentences.length; i++) {
+                const sentence = sentences[i];
+                if (!sentence.english || !sentence.vietnamese) {
+                    throw new Error(`Câu thứ ${i + 1} thiếu trường 'english' hoặc 'vietnamese'`);
+                }
+            }
+
+            // Confirm import
+            const confirmImport = confirm(`Bạn có muốn nhập ${sentences.length} câu không?\nDữ liệu hiện tại sẽ được thay thế.`);
+
+            if (confirmImport) {
+                loadSentencesToContainer(sentences);
+                closeImportModal();
+                showNotification(`✅ Đã nhập thành công ${sentences.length} câu!`, 'success');
+
+                // Auto save to localStorage
+                saveToLocalStorage();
+            }
+
+        } catch (error) {
+            showNotification('❌ Lỗi định dạng JSON: ' + error.message, 'error');
+        }
+    }
+
+    function exportToJSON() {
+        const sentences = getAllSentences();
+
+        if (sentences.length === 0) {
+            showNotification('❌ Không có dữ liệu để xuất', 'error');
+            return;
+        }
+
+        const dataStr = JSON.stringify(sentences, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `english_sentences_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+
+        showNotification(`💾 Đã xuất ${sentences.length} câu ra file JSON`, 'success');
+    }
+
+    function loadSentencesToContainer(sentences) {
+        const container = document.getElementById('sentences-container');
+        container.innerHTML = '';
+
+        sentences.forEach(sentence => {
+            const newCard = createSentenceCard(sentence.english, sentence.vietnamese);
+            container.appendChild(newCard);
+        });
+    }
+
+    function createSentenceCard(englishText = '', vietnameseText = '') {
+        const newCard = document.createElement('div');
+        newCard.className = 'sentence-card new-card';
+
+        newCard.innerHTML = `
+            <div class="english-line">
+                <div class="english-text" contenteditable="true" data-placeholder="Nhập câu tiếng Anh...">${englishText}</div>
+                <button class="play-button" onclick="speakText(this)">
+                    🔊
+                </button>
+            </div>
+            <div class="vietnamese-text" contenteditable="true" data-placeholder="Nhập nghĩa tiếng Việt...">${vietnameseText}</div>
+           <button class="delete-button" onclick="deleteSentence(this)">
+               🗑️
+           </button>
+       `;
+
+        // Setup placeholder handling
+        handlePlaceholder(newCard.querySelector('.english-text'));
+        handlePlaceholder(newCard.querySelector('.vietnamese-text'));
+
+        return newCard;
+    }
+
+    // Text-to-Speech với giọng tiếng Anh B1
+    function speakText(button) {
+        const englishText = button.parentElement.querySelector('.english-text').textContent.trim();
+
+        if (englishText && englishText !== 'Nhập câu tiếng Anh...') {
+            speakEnglishText(englishText, button);
+        } else {
+            showNotification('⚠️ Vui lòng nhập câu tiếng Anh trước khi phát âm!', 'error');
+        }
+    }
+
+    function speakEnglishText(text, button = null) {
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Cài đặt cho trình độ B1
+        utterance.lang = 'en-US';
+        utterance.rate = 0.8; // Tốc độ chậm hơn cho B1
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // Thử tìm giọng nói tiếng Anh phù hợp
+        const voices = speechSynthesis.getVoices();
+        const englishVoice = voices.find(voice =>
+            voice.lang.startsWith('en-') && voice.name.includes('Female')
+        ) || voices.find(voice => voice.lang.startsWith('en-'));
+
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        }
+
+        // Hiệu ứng nút khi đang phát
+        if (button) {
+            button.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+
+            utterance.onend = function () {
+                button.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+            };
+        }
+
+        speechSynthesis.speak(utterance);
+    }
+
+    // Chế độ luyện tập
+    function showPracticeMode() {
+        document.getElementById('practice-container').style.display = 'block';
+        document.getElementById('test-container').style.display = 'none';
+        document.getElementById('results-container').style.display = 'none';
+
+        // Cập nhật active button
+        document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // Chế độ kiểm tra
+    function showTestMode() {
+        const sentences = getAllSentences();
+        if (sentences.length < 5) {
+            showNotification('❌ Cần ít nhất 5 câu để bắt đầu kiểm tra. Vui lòng thêm thêm câu!', 'error');
+            return;
+        }
+
+        document.getElementById('practice-container').style.display = 'none';
+        document.getElementById('test-container').style.display = 'block';
+        document.getElementById('results-container').style.display = 'none';
+
+        // Cập nhật active button
+        document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Chuẩn bị bài kiểm tra
+        prepareTest(sentences);
+    }
+
+    function getAllSentences() {
+        const sentences = [];
+        const cards = document.querySelectorAll('#sentences-container .sentence-card');
+
+        cards.forEach(card => {
+            const englishText = card.querySelector('.english-text').textContent.trim();
+            const vietnameseText = card.querySelector('.vietnamese-text').textContent.trim();
+
+            if (englishText && englishText !== 'Nhập câu tiếng Anh...' &&
+                vietnameseText && vietnameseText !== 'Nhập nghĩa tiếng Việt...') {
+                sentences.push({
+                    english: englishText,
+                    vietnamese: vietnameseText
+                });
+            }
+        });
+
+        return sentences;
+    }
+
+    function prepareTest(sentences) {
+        // Lấy ngẫu nhiên tối đa 20 câu
+        const shuffled = [...sentences].sort(() => 0.5 - Math.random());
+        testQuestions = shuffled.slice(0, Math.min(20, sentences.length));
+
+        // Reset test state
+        currentQuestionIndex = 0;
+        userAnswers = new Array(testQuestions.length).fill('');
+
+        // Cập nhật UI
+        document.getElementById('total-questions').textContent = testQuestions.length;
+        updateTestQuestion();
+    }
+
+    function updateTestQuestion() {
+        const question = testQuestions[currentQuestionIndex];
+
+        document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+        document.getElementById('question-number').textContent = currentQuestionIndex + 1;
+        document.getElementById('answer-input').value = userAnswers[currentQuestionIndex];
+
+        // Cập nhật progress bar
+        const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+
+        // Cập nhật navigation buttons
+        document.getElementById('prev-button').disabled = currentQuestionIndex === 0;
+        document.getElementById('next-button').style.display =
+            currentQuestionIndex === testQuestions.length - 1 ? 'none' : 'block';
+        document.getElementById('submit-button').style.display =
+            currentQuestionIndex === testQuestions.length - 1 ? 'block' : 'none';
+    }
+
+    function playTestAudio() {
+        const question = testQuestions[currentQuestionIndex];
+        const button = document.querySelector('.test-play-button');
+        speakEnglishText(question.english, button);
+    }
+
+    function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+            // Lưu câu trả lời hiện tại
+            userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
+            currentQuestionIndex--;
+            updateTestQuestion();
+        }
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < testQuestions.length - 1) {
+            // Lưu câu trả lời hiện tại
+            userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
+            currentQuestionIndex++;
+            updateTestQuestion();
+        }
+    }
+
+    function submitTest() {
+        // Lưu câu trả lời cuối cùng
+        userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
+
+        // Tính điểm và hiển thị kết quả
+        calculateAndShowResults();
+    }
+
+    function calculateAndShowResults() {
+        let totalSimilarity = 0;
+        const results = [];
+
+        for (let i = 0; i < testQuestions.length; i++) {
+            const question = testQuestions[i];
+            const userAnswer = userAnswers[i].trim().toLowerCase();
+            const correctAnswer = question.english.toLowerCase();
+
+            // Tính độ chính xác
+            const similarity = calculateSimilarity(userAnswer, correctAnswer);
+            totalSimilarity += similarity;
+
+            // Một câu được coi là đúng nếu >= 80% chính xác
+            const isCorrect = similarity >= 0.8;
+
+            results.push({
+                question: question,
+                userAnswer: userAnswers[i],
+                isCorrect: isCorrect,
+                similarity: similarity
+            });
+        }
+
+        // Tính điểm trung bình từ tổng % chính xác
+        const averageScore = totalSimilarity / testQuestions.length;
+
+        showResults(averageScore, results);
+    }
+
+    function calculateSimilarity(str1, str2) {
+        const normalized1 = normalizeText(str1);
+        const normalized2 = normalizeText(str2);
+
+        // Nếu giống hệt nhau
+        if (normalized1 === normalized2) return 1;
+
+        // Tính similarity bằng cách so sánh từng từ
+        const words1 = normalized1.split(' ');
+        const words2 = normalized2.split(' ');
+
+        let correctWords = 0;
+        const maxWords = Math.max(words1.length, words2.length);
+
+        // Đếm số từ giống nhau (không cần thứ tự)
+        const words2Copy = [...words2];
+        for (let word of words1) {
+            const index = words2Copy.indexOf(word);
+            if (index !== -1) {
+                correctWords++;
+                words2Copy.splice(index, 1);
+            }
+        }
+
+        return correctWords / maxWords;
+    }
+
+    function normalizeText(text) {
+        return text.toLowerCase()
+            .replace(/[^\w\s]/g, '') // Loại bỏ dấu câu
+            .replace(/\s+/g, ' ')    // Chuẩn hóa khoảng trắng
+            .trim();
+    }
+
+    function showResults(averageScore, results) {
+        document.getElementById('test-container').style.display = 'none';
+        document.getElementById('results-container').style.display = 'block';
+
+        // Hiển thị điểm số trung bình
+        updateScoreDisplay(averageScore, results);
+
+        // Tạo chi tiết kết quả
+        const resultsDetails = document.getElementById('results-details');
+        resultsDetails.innerHTML = '';
+
+        results.forEach((result, index) => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result-item ${result.isCorrect ? 'result-correct' : 'result-incorrect'}`;
+
+            const similarityPercent = Math.round(result.similarity * 100);
+
+            resultDiv.innerHTML = `
+        <div class="result-question">Câu ${index + 1}: ${result.question.vietnamese}</div>
+        <div class="result-answer">
+            <strong>Bạn viết:</strong> 
+            <span class="user-answer">${result.userAnswer || '(Không trả lời)'}</span>
+            ${result.userAnswer ? `<small style="color: #7f8c8d;"> (${similarityPercent}% chính xác)</small>` : ''}
+        </div>
+        <div class="result-answer">
+            <strong>Đáp án:</strong> 
+            <span class="correct-answer">${result.question.english}</span>
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="play-button" onclick="speakEnglishText('${result.question.english.replace(/'/g, "\\'")}', this)" style="width: 35px; height: 35px; font-size: 12px;">
+                🔊
+            </button>
+        </div>
+    `;
+
+            resultsDetails.appendChild(resultDiv);
+        });
+    }
+
+    function getScoreColor(percentage) {
+        if (percentage >= 90) return '#27ae60';  // Xanh lá
+        if (percentage >= 80) return '#f39c12';  // Cam
+        if (percentage >= 70) return '#e67e22';  // Cam đậm
+        return '#e74c3c';  // Đỏ
+    }
+
+    function updateScoreDisplay(averageScore, results) {
+        const percentage = averageScore * 100;
+        const scoreElement = document.getElementById('score-display');
+
+        // Hiển thị điểm trung bình
+        scoreElement.textContent = `${Math.round(percentage)}%`;
+        scoreElement.style.color = getScoreColor(percentage);
+
+        // Đếm số câu đúng (>= 80%) để hiển thị thêm
+        const correctCount = results.filter(r => r.isCorrect).length;
+
+        // Thêm text mô tả
+        const scoreText = document.querySelector('.score-text');
+        let description = '';
+
+        if (percentage >= 90) description = 'Xuất sắc! 🎉';
+        else if (percentage >= 80) description = 'Tốt! 👍';
+        else if (percentage >= 70) description = 'Khá! 👌';
+        else if (percentage >= 60) description = 'Trung bình 😐';
+        else description = 'Cần cố gắng thêm! 💪';
+
+        scoreText.innerHTML = `Điểm trung bình: ${Math.round(percentage)}%<br>
+                      <small>Câu đúng: ${correctCount}/${results.length} - ${description}</small>`;
+    }
+
+    function retakeTest() {
+        showTestMode();
+    }
+
+    // Thêm câu mới
+    function addNewSentence() {
+        const container = document.getElementById('sentences-container');
+        const newCard = createSentenceCard();
+
+        container.appendChild(newCard);
+
+        // Cuộn đến thẻ mới và focus vào ô tiếng Anh
+        setTimeout(() => {
+            newCard.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            const englishInput = newCard.querySelector('.english-text');
+            englishInput.focus();
+        }, 100);
+    }
+
+    // Xóa câu
+    function deleteSentence(button) {
+        if (confirm('Bạn có chắc muốn xóa câu này không?')) {
+            const card = button.parentElement;
+            card.style.animation = 'slideOut 0.3s ease';
+
+            setTimeout(() => {
+                card.remove();
+                scheduleAutoSave(); // Auto save after delete
+            }, 300);
+        }
+    }
+
+    // Xử lý placeholder cho các ô nhập liệu
+    function handlePlaceholder(element) {
+        const placeholder = element.getAttribute('data-placeholder');
+
+        element.addEventListener('focus', function () {
+            if (this.textContent.trim() === '' || this.textContent === placeholder) {
+                this.textContent = '';
+                this.style.color = '#2c3e50';
+            }
+        });
+
+        element.addEventListener('blur', function () {
+            if (this.textContent.trim() === '') {
+                this.textContent = '';
+                this.style.color = '#bdc3c7';
+            }
+        });
+
+        // Hiển thị placeholder ban đầu
+        if (element.textContent.trim() === '') {
+            element.style.color = '#bdc3c7';
+        }
+    }
+
+    // Local Storage functions
+    function saveToLocalStorage() {
+        const sentences = getAllSentences();
+        localStorage.setItem('englishLearningData', JSON.stringify(sentences));
+    }
+
+    function loadFromLocalStorage() {
+        const savedData = localStorage.getItem('englishLearningData');
+        if (savedData) {
+            try {
+                const sentences = JSON.parse(savedData);
+                if (Array.isArray(sentences) && sentences.length > 0) {
+                    loadSentencesToContainer(sentences);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading from localStorage:', error);
+            }
+        }
+        return false;
+    }
+
+    // Thêm auto-save với debounce
+    let autoSaveTimeout;
+    function scheduleAutoSave() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            saveToLocalStorage();
+            
+            // Nếu đã kết nối Firebase, tự động sync
+            if (firebaseConnected && getAllSentences().length > 0) {
+                syncWithFirebase();
+            }
+        }, 2000);
+    }
+
+    // Thêm câu mẫu để demo
+    function addSampleSentences() {
+        const sampleSentences = [
+            {
+                english: "Hello, how are you today?",
+                vietnamese: "Xin chào, hôm nay bạn thế nào?"
+            },
+            {
+                english: "What time is it now?",
+                vietnamese: "Bây giờ là mấy giờ?"
+            },
+            {
+                english: "I love reading books in my free time.",
+                vietnamese: "Tôi thích đọc sách trong thời gian rảnh."
+            },
+            {
+                english: "The weather is beautiful today.",
+                vietnamese: "Thời tiết hôm nay thật đẹp."
+            },
+            {
+                english: "Can you help me with this problem?",
+                vietnamese: "Bạn có thể giúp tôi giải quyết vấn đề này không?"
+            }
+        ];
+
+        loadSentencesToContainer(sampleSentences);
+    }
+
+    // Hàm khởi tạo app - improved version
+    async function initializeApp() {
+        console.log('🚀 Initializing app...');
+        
+        // Load voices khi trang web được tải
+        speechSynthesis.getVoices();
+        
+        // Đảm bảo voices được load (một số browser cần thời gian)
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                speechSynthesis.getVoices();
+            };
+        }
+
+        // Thử tải từ Firebase trước
+        console.log('⏳ Trying to load from Firebase...');
+        const firebaseLoadSuccess = await tryLoadFromFirebase();
+        
+        if (firebaseLoadSuccess) {
+            console.log('✅ Loaded from Firebase successfully');
+            showNotification('📥 Đã tải dữ liệu từ cloud', 'success');
+        } else {
+            console.log('❌ Failed to load from Firebase, trying localStorage...');
+            
+            // Nếu Firebase thất bại, thử localStorage
+            const localStorageLoadSuccess = loadFromLocalStorage();
+            
+            if (localStorageLoadSuccess) {
+                console.log('✅ Loaded from localStorage');
+                showNotification('📱 Đã tải dữ liệu từ bộ nhớ máy', 'info');
+                
+                // Thử sync với Firebase sau khi load từ localStorage
+                setTimeout(retryFirebaseConnection, 3000);
+            } else {
+                console.log('ℹ️ No saved data found, loading sample sentences');
+                addSampleSentences();
+                showNotification('🎯 Đã tải dữ liệu mẫu', 'info');
+            }
+        }
+    }
+
+    // Event Listeners
+    document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+
+            const selection = window.getSelection();
+            if (selection.toString().length > 0) {
+                document.execCommand('bold');
+            }
+        }
+
+        // Enter để chuyển câu tiếp theo trong test
+        if (e.key === 'Enter' && document.getElementById('test-container').style.display === 'block') {
+            e.preventDefault();
+            if (currentQuestionIndex < testQuestions.length - 1) {
+                nextQuestion();
+            } else {
+                submitTest();
+            }
+        }
+
+        // Keyboard shortcuts
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            showTestMode();
+        }
+
+        if (e.ctrlKey && e.key === 'p') {
+            e.preventDefault();
+            showPracticeMode();
+        }
+
+        if (e.ctrlKey && e.key === 'n') {
+            e.preventDefault();
+            if (document.getElementById('practice-container').style.display !== 'none') {
+                addNewSentence();
+            }
+        }
+
+        // Import/Export shortcuts
+        if (e.ctrlKey && e.key === 'i') {
+            e.preventDefault();
+            showImportModal();
+        }
+
+        if (e.ctrlKey && e.key === 'e') {
+            e.preventDefault();
+            exportToJSON();
+        }
+
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            syncWithFirebase();
+        }
+    });
+
+    // Auto-save khi người dùng nhập liệu - improved version
+    document.addEventListener('input', function (e) {
+        if (e.target.contentEditable === 'true') {
+            scheduleAutoSave();
+        }
+    });
+
+    // Xử lý paste text
+    document.addEventListener('paste', function (e) {
+        const target = e.target;
+        if (target.contentEditable === 'true') {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        }
+    });
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function (e) {
+        const modal = document.getElementById('import-modal');
+        if (e.target === modal) {
+            closeImportModal();
+        }
+    });
+
+    // Network status listeners
+    window.addEventListener('online', function() {
+        console.log('🌐 Network back online, retrying Firebase...');
+        retryFirebaseConnection();
+    });
+
+    window.addEventListener('offline', function() {
+        console.log('📵 Network offline');
+        updateConnectionStatus(false);
+    });
+
+    // CSS cho animation slideOut
+    const style = document.createElement('style');
+    style.textContent = `
+       @keyframes slideOut {
+           from {
+               opacity: 1;
+               transform: translateX(0);
+           }
+           to {
+               opacity: 0;
+               transform: translateX(-100%);
+           }
+       }
+   `;
+    document.head.appendChild(style);
+
+    // Khởi tạo khi trang web được tải - improved version
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Visibility change listener - tự động sync khi user quay lại tab
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && firebaseConnected) {
+            // Nếu user quay lại tab và Firebase đã kết nối, thử tải dữ liệu mới nhất
+            setTimeout(() => {
+                tryLoadFromFirebase(1);
+            }, 1000);
+        }
+    });
+
+    // Before unload - save data before user leaves
+    window.addEventListener('beforeunload', function(e) {
+        // Lưu vào localStorage trước khi rời khỏi trang
+        saveToLocalStorage();
+        
+        // Nếu có dữ liệu mới và Firebase connected, thử sync nhanh
+        if (firebaseConnected && getAllSentences().length > 0) {
+            // Quick sync without waiting
+            const sentences = getAllSentences();
+            const timestamp = new Date();
+            
+            db.collection('sentences').doc('user_data').set({
+                sentences: sentences,
+                lastUpdated: timestamp,
+                count: sentences.length
+            }).catch(console.error);
+        }
+    });
+
+    // Service Worker registration để cache app cho offline usage
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            // Tạo một service worker đơn giản
+            const swCode = `
+                const CACHE_NAME = 'english-learning-v1';
+                const urlsToCache = [
+                    '/',
+                    '/style.css',
+                    '/script.js'
+                ];
+
+                self.addEventListener('install', function(event) {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(function(cache) {
+                                return cache.addAll(urlsToCache);
+                            })
+                    );
+                });
+
+                self.addEventListener('fetch', function(event) {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(function(response) {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request);
+                            }
+                        )
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(function(registration) {
+                    console.log('✅ Service Worker registered successfully');
+                })
+                .catch(function(error) {
+                    console.log('❌ Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    // Performance optimization - lazy loading cho large datasets
+    function optimizePerformance() {
+        // Nếu có quá nhiều câu (>100), chỉ hiển thị 50 câu đầu
+        const allCards = document.querySelectorAll('#sentences-container .sentence-card');
+        if (allCards.length > 100) {
+            allCards.forEach((card, index) => {
+                if (index >= 50) {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Thêm nút "Load more"
+            const loadMoreBtn = document.createElement('button');
+            loadMoreBtn.className = 'add-button';
+            loadMoreBtn.innerHTML = '📄 Hiển thị thêm câu';
+            loadMoreBtn.onclick = function() {
+                const hiddenCards = document.querySelectorAll('#sentences-container .sentence-card[style*="display: none"]');
+                for (let i = 0; i < Math.min(25, hiddenCards.length); i++) {
+                    hiddenCards[i].style.display = 'block';
+                }
+                
+                if (hiddenCards.length <= 25) {
+                    loadMoreBtn.remove();
+                }
+            };
+            
+            document.getElementById('sentences-container').appendChild(loadMoreBtn);
+        }
+    }
+
+    // Error handling và logging
+    window.addEventListener('error', function(e) {
+        console.error('❌ JavaScript Error:', e.error);
+        showNotification('⚠️ Đã xảy ra lỗi, vui lòng tải lại trang', 'error');
+    });
+
+    window.addEventListener('unhandledrejection', function(e) {
+        console.error('❌ Unhandled Promise Rejection:', e.reason);
+        // Không hiển thị notification cho promise rejection để tránh spam
+    });
+
+    // Health check function
+    function performHealthCheck() {
+        const healthStatus = {
+            localStorage: false,
+            firebase: firebaseConnected,
+            speechSynthesis: 'speechSynthesis' in window,
+            dataIntegrity: false
+        };
+
+        // Check localStorage
+        try {
+            localStorage.setItem('health-check', 'test');
+            localStorage.removeItem('health-check');
+            healthStatus.localStorage = true;
+        } catch (e) {
+            healthStatus.localStorage = false;
+        }
+
+        // Check data integrity
+        const sentences = getAllSentences();
+        healthStatus.dataIntegrity = sentences.length > 0;
+
+        console.log('🏥 Health Check:', healthStatus);
+        
+        return healthStatus;
+    }
+
+    // Chạy health check mỗi 5 phút
+    setInterval(performHealthCheck, 5 * 60 * 1000);
+    
+</script>
+
+   
+</body>
+
+</html>
