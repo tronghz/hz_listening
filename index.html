@@ -568,21 +568,39 @@
                 padding: 20px;
             }
         }
+
         .answer-input {
-    width: 100%;
-    padding: 15px;
-    font-size: 16px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    outline: none;
-    transition: border-color 0.3s ease;
-    margin-bottom: 20px;
-    resize: none;
-    overflow: hidden;
-    min-height: 50px;
-    max-height: 200px;
-    line-height: 1.4;
-}
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            margin-bottom: 20px;
+            resize: none;
+            overflow: hidden;
+            min-height: 50px;
+            max-height: 200px;
+            line-height: 1.4;
+        }
+
+        /* Animation cho card mới thêm từ trên xuống */
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-card {
+            animation: slideInFromTop 0.5s ease;
+        }
     </style>
 </head>
 
@@ -611,15 +629,15 @@
             </div>
 
             <div class="control-buttons">
-                <!-- <button class="add-button" onclick="addNewSentence()">
+                <button class="add-button" onclick="addNewSentence()">
                     ➕ Thêm Câu
-                </button> -->
+                </button>
                 <button class="import-button" onclick="showImportModal()">
                     📁 Nhập JSON
                 </button>
-                <button class="export-button" onclick="exportToJSON()">
+                <!-- <button class="export-button" onclick="exportToJSON()">
                     💾 Xuất JSON
-                </button>
+                </button> -->
                 <!-- <button class="sync-button" onclick="syncWithFirebase()">
                     ☁️ Đồng Bộ
                 </button> -->
@@ -647,7 +665,7 @@
                     🔊
                 </button>
                 <textarea class="answer-input" id="answer-input" rows="2"
-    placeholder="Nhập câu tiếng Anh bạn nghe được..."></textarea>
+                    placeholder="Nhập câu tiếng Anh bạn nghe được..."></textarea>
 
                 <div class="test-navigation">
                     <button class="nav-button" id="prev-button" onclick="previousQuestion()" disabled>
@@ -723,177 +741,177 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-<script>
-    // Firebase Configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
-        authDomain: "hz-listening.firebaseapp.com",
-        projectId: "hz-listening",
-        storageBucket: "hz-listening.firebasestorage.app",
-        messagingSenderId: "1044959632237",
-        appId: "1:1044959632237:web:d2fcc1294a83ca5349d864",
-        measurementId: "G-SEY2ERMPDW"
-    };
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
+            authDomain: "hz-listening.firebaseapp.com",
+            projectId: "hz-listening",
+            storageBucket: "hz-listening.firebasestorage.app",
+            messagingSenderId: "1044959632237",
+            appId: "1:1044959632237:web:d2fcc1294a83ca5349d864",
+            measurementId: "G-SEY2ERMPDW"
+        };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-    let testQuestions = [];
-    let currentQuestionIndex = 0;
-    let userAnswers = [];
-    let firebaseConnected = false;
-    let unsubscribe = null; // Để quản lý real-time listener
+        let testQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let firebaseConnected = false;
+        let unsubscribe = null; // Để quản lý real-time listener
 
-    // Firebase connection status
-    function updateConnectionStatus(connected) {
-        firebaseConnected = connected;
-        const indicator = document.getElementById('status-indicator');
+        // Firebase connection status
+        function updateConnectionStatus(connected) {
+            firebaseConnected = connected;
+            const indicator = document.getElementById('status-indicator');
 
-        if (connected) {
-            indicator.className = 'status-indicator status-connected';
-            indicator.innerHTML = '🟢 Đã kết nối';
-        } else {
-            indicator.className = 'status-indicator status-disconnected';
-            indicator.innerHTML = '🔴 Không kết nối';
-        }
-    }
-
-    // Setup real-time listener cho Firebase
-    function setupRealtimeListener() {
-        if (unsubscribe) {
-            unsubscribe(); // Hủy listener cũ nếu có
+            if (connected) {
+                indicator.className = 'status-indicator status-connected';
+                indicator.innerHTML = '🟢 Đã kết nối';
+            } else {
+                indicator.className = 'status-indicator status-disconnected';
+                indicator.innerHTML = '🔴 Không kết nối';
+            }
         }
 
-        unsubscribe = db.collection('sentences').doc('user_data')
-            .onSnapshot(
-                (doc) => {
-                    updateConnectionStatus(true);
-                    
-                    if (doc.exists) {
-                        const data = doc.data();
-                        if (data.sentences && Array.isArray(data.sentences)) {
-                            // Chỉ cập nhật UI nếu dữ liệu thực sự thay đổi
-                            const currentSentences = getAllSentences();
-                            if (JSON.stringify(currentSentences) !== JSON.stringify(data.sentences)) {
-                                loadSentencesToContainer(data.sentences);
-                                console.log(`🔄 Real-time update: ${data.sentences.length} sentences`);
+        // Setup real-time listener cho Firebase
+        function setupRealtimeListener() {
+            if (unsubscribe) {
+                unsubscribe(); // Hủy listener cũ nếu có
+            }
+
+            unsubscribe = db.collection('sentences').doc('user_data')
+                .onSnapshot(
+                    (doc) => {
+                        updateConnectionStatus(true);
+
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.sentences && Array.isArray(data.sentences)) {
+                                // Chỉ cập nhật UI nếu dữ liệu thực sự thay đổi
+                                const currentSentences = getAllSentences();
+                                if (JSON.stringify(currentSentences) !== JSON.stringify(data.sentences)) {
+                                    loadSentencesToContainer(data.sentences);
+                                    console.log(`🔄 Real-time update: ${data.sentences.length} sentences`);
+                                }
                             }
                         }
+                    },
+                    (error) => {
+                        console.error('Real-time listener error:', error);
+                        updateConnectionStatus(false);
+
+                        // Thử kết nối lại sau 5 giây
+                        setTimeout(setupRealtimeListener, 5000);
                     }
-                },
-                (error) => {
-                    console.error('Real-time listener error:', error);
-                    updateConnectionStatus(false);
-                    
-                    // Thử kết nối lại sau 5 giây
-                    setTimeout(setupRealtimeListener, 5000);
-                }
-            );
-    }
-
-    // Lưu trực tiếp lên Firebase (thay thế sync)
-    async function saveToFirebase() {
-        if (!firebaseConnected) return;
-
-        try {
-            const sentences = getAllSentences();
-            const timestamp = new Date();
-
-            await db.collection('sentences').doc('user_data').set({
-                sentences: sentences,
-                lastUpdated: timestamp,
-                count: sentences.length
-            });
-
-            console.log('✅ Saved to Firebase successfully');
-            
-        } catch (error) {
-            console.error('❌ Save to Firebase error:', error);
-            updateConnectionStatus(false);
+                );
         }
-    }
 
-    // Thêm câu mới trực tiếp lên Firebase
-    async function addNewSentenceToFirebase(english = '', vietnamese = '') {
-        try {
-            const currentSentences = getAllSentences();
-            const newSentence = { english, vietnamese };
-            const updatedSentences = [...currentSentences, newSentence];
+        // Lưu trực tiếp lên Firebase (thay thế sync)
+        async function saveToFirebase() {
+            if (!firebaseConnected) return;
 
-            await db.collection('sentences').doc('user_data').set({
-                sentences: updatedSentences,
-                lastUpdated: new Date(),
-                count: updatedSentences.length
-            });
-
-        } catch (error) {
-            console.error('❌ Add sentence error:', error);
-            showNotification('❌ Lỗi thêm câu mới', 'error');
-        }
-    }
-
-    // Xóa câu trực tiếp trên Firebase
-    async function deleteSentenceFromFirebase(index) {
-        try {
-            const currentSentences = getAllSentences();
-            const updatedSentences = currentSentences.filter((_, i) => i !== index);
-
-            await db.collection('sentences').doc('user_data').set({
-                sentences: updatedSentences,
-                lastUpdated: new Date(),
-                count: updatedSentences.length
-            });
-
-        } catch (error) {
-            console.error('❌ Delete sentence error:', error);
-            showNotification('❌ Lỗi xóa câu', 'error');
-        }
-    }
-
-    // Cập nhật câu trực tiếp trên Firebase
-    async function updateSentenceInFirebase(index, english, vietnamese) {
-        try {
-            const currentSentences = getAllSentences();
-            if (index >= 0 && index < currentSentences.length) {
-                currentSentences[index] = { english, vietnamese };
+            try {
+                const sentences = getAllSentences();
+                const timestamp = new Date();
 
                 await db.collection('sentences').doc('user_data').set({
-                    sentences: currentSentences,
-                    lastUpdated: new Date(),
-                    count: currentSentences.length
+                    sentences: sentences,
+                    lastUpdated: timestamp,
+                    count: sentences.length
                 });
+
+                console.log('✅ Saved to Firebase successfully');
+
+            } catch (error) {
+                console.error('❌ Save to Firebase error:', error);
+                updateConnectionStatus(false);
             }
-
-        } catch (error) {
-            console.error('❌ Update sentence error:', error);
         }
-    }
 
-    // Load data từ Firebase (chỉ dùng 1 lần khi khởi tạo)
-    async function loadFromFirebase() {
-        try {
-            const doc = await db.collection('sentences').doc('user_data').get();
-            
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.sentences && Array.isArray(data.sentences)) {
-                    loadSentencesToContainer(data.sentences);
-                    console.log(`📥 Loaded ${data.sentences.length} sentences from Firebase`);
-                    return true;
+        // Thêm câu mới trực tiếp lên Firebase
+        async function addNewSentenceToFirebase(english = '', vietnamese = '') {
+            try {
+                const currentSentences = getAllSentences();
+                const newSentence = { english, vietnamese };
+                const updatedSentences = [...currentSentences, newSentence];
+
+                await db.collection('sentences').doc('user_data').set({
+                    sentences: updatedSentences,
+                    lastUpdated: new Date(),
+                    count: updatedSentences.length
+                });
+
+            } catch (error) {
+                console.error('❌ Add sentence error:', error);
+                showNotification('❌ Lỗi thêm câu mới', 'error');
+            }
+        }
+
+        // Xóa câu trực tiếp trên Firebase
+        async function deleteSentenceFromFirebase(index) {
+            try {
+                const currentSentences = getAllSentences();
+                const updatedSentences = currentSentences.filter((_, i) => i !== index);
+
+                await db.collection('sentences').doc('user_data').set({
+                    sentences: updatedSentences,
+                    lastUpdated: new Date(),
+                    count: updatedSentences.length
+                });
+
+            } catch (error) {
+                console.error('❌ Delete sentence error:', error);
+                showNotification('❌ Lỗi xóa câu', 'error');
+            }
+        }
+
+        // Cập nhật câu trực tiếp trên Firebase
+        async function updateSentenceInFirebase(index, english, vietnamese) {
+            try {
+                const currentSentences = getAllSentences();
+                if (index >= 0 && index < currentSentences.length) {
+                    currentSentences[index] = { english, vietnamese };
+
+                    await db.collection('sentences').doc('user_data').set({
+                        sentences: currentSentences,
+                        lastUpdated: new Date(),
+                        count: currentSentences.length
+                    });
                 }
-            }
-            return false;
-        } catch (error) {
-            console.error('❌ Load from Firebase error:', error);
-            return false;
-        }
-    }
 
-    // Show notification
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
+            } catch (error) {
+                console.error('❌ Update sentence error:', error);
+            }
+        }
+
+        // Load data từ Firebase (chỉ dùng 1 lần khi khởi tạo)
+        async function loadFromFirebase() {
+            try {
+                const doc = await db.collection('sentences').doc('user_data').get();
+
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.sentences && Array.isArray(data.sentences)) {
+                        loadSentencesToContainer(data.sentences);
+                        console.log(`📥 Loaded ${data.sentences.length} sentences from Firebase`);
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('❌ Load from Firebase error:', error);
+                return false;
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
             position: fixed;
             top: 80px;
             right: 20px;
@@ -906,455 +924,454 @@
             animation: slideIn 0.3s ease;
         `;
 
-        switch (type) {
-            case 'success':
-                notification.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
-                break;
-            case 'error':
-                notification.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
-                break;
-            case 'info':
-                notification.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
-                break;
-        }
+            switch (type) {
+                case 'success':
+                    notification.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+                    break;
+                case 'error':
+                    notification.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
+                    break;
+                case 'info':
+                    notification.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+                    break;
+            }
 
-        notification.textContent = message;
-        document.body.appendChild(notification);
+            notification.textContent = message;
+            document.body.appendChild(notification);
 
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
-
-    // Import/Export Functions (giữ nguyên)
-    function showImportModal() {
-        document.getElementById('import-modal').style.display = 'block';
-    }
-
-    function closeImportModal() {
-        document.getElementById('import-modal').style.display = 'none';
-        document.getElementById('json-input').value = '';
-    }
-
-    function loadJSONFile(input) {
-        const file = input.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('json-input').value = e.target.result;
-            };
-            reader.readAsText(file);
-        }
-    }
-
-    async function importFromJSON() {
-        const jsonInput = document.getElementById('json-input').value.trim();
-
-        if (!jsonInput) {
-            showNotification('❌ Vui lòng nhập nội dung JSON', 'error');
-            return;
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
         }
 
-        try {
-            const sentences = JSON.parse(jsonInput);
+        // Import/Export Functions (giữ nguyên)
+        function showImportModal() {
+            document.getElementById('import-modal').style.display = 'block';
+        }
 
-            if (!Array.isArray(sentences)) {
-                throw new Error('Dữ liệu phải là một mảng các câu');
+        function closeImportModal() {
+            document.getElementById('import-modal').style.display = 'none';
+            document.getElementById('json-input').value = '';
+        }
+
+        function loadJSONFile(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('json-input').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        async function importFromJSON() {
+            const jsonInput = document.getElementById('json-input').value.trim();
+
+            if (!jsonInput) {
+                showNotification('❌ Vui lòng nhập nội dung JSON', 'error');
+                return;
             }
 
-            // Validate structure
-            for (let i = 0; i < sentences.length; i++) {
-                const sentence = sentences[i];
-                if (!sentence.english || !sentence.vietnamese) {
-                    throw new Error(`Câu thứ ${i + 1} thiếu trường 'english' hoặc 'vietnamese'`);
+            try {
+                const sentences = JSON.parse(jsonInput);
+
+                if (!Array.isArray(sentences)) {
+                    throw new Error('Dữ liệu phải là một mảng các câu');
                 }
+
+                // Validate structure
+                for (let i = 0; i < sentences.length; i++) {
+                    const sentence = sentences[i];
+                    if (!sentence.english || !sentence.vietnamese) {
+                        throw new Error(`Câu thứ ${i + 1} thiếu trường 'english' hoặc 'vietnamese'`);
+                    }
+                }
+
+                // Confirm import
+                const confirmImport = confirm(`Bạn có muốn nhập ${sentences.length} câu không?\nDữ liệu hiện tại sẽ được thay thế.`);
+
+                if (confirmImport) {
+                    // Import trực tiếp lên Firebase
+                    await db.collection('sentences').doc('user_data').set({
+                        sentences: sentences,
+                        lastUpdated: new Date(),
+                        count: sentences.length
+                    });
+
+                    closeImportModal();
+                    showNotification(`✅ Đã nhập thành công ${sentences.length} câu!`, 'success');
+                }
+
+            } catch (error) {
+                showNotification('❌ Lỗi: ' + error.message, 'error');
+            }
+        }
+
+        function exportToJSON() {
+            const sentences = getAllSentences();
+
+            if (sentences.length === 0) {
+                showNotification('❌ Không có dữ liệu để xuất', 'error');
+                return;
             }
 
-            // Confirm import
-            const confirmImport = confirm(`Bạn có muốn nhập ${sentences.length} câu không?\nDữ liệu hiện tại sẽ được thay thế.`);
+            const dataStr = JSON.stringify(sentences, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
 
-            if (confirmImport) {
-                // Import trực tiếp lên Firebase
-                await db.collection('sentences').doc('user_data').set({
-                    sentences: sentences,
-                    lastUpdated: new Date(),
-                    count: sentences.length
-                });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `english_sentences_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
 
-                closeImportModal();
-                showNotification(`✅ Đã nhập thành công ${sentences.length} câu!`, 'success');
-            }
-
-        } catch (error) {
-            showNotification('❌ Lỗi: ' + error.message, 'error');
-        }
-    }
-
-    function exportToJSON() {
-        const sentences = getAllSentences();
-
-        if (sentences.length === 0) {
-            showNotification('❌ Không có dữ liệu để xuất', 'error');
-            return;
+            showNotification(`💾 Đã xuất ${sentences.length} câu ra file JSON`, 'success');
         }
 
-        const dataStr = JSON.stringify(sentences, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        function loadSentencesToContainer(sentences) {
+            const container = document.getElementById('sentences-container');
+            container.innerHTML = '';
 
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(dataBlob);
-        link.download = `english_sentences_${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
+            sentences.forEach((sentence, index) => {
+                const newCard = createSentenceCard(sentence.english, sentence.vietnamese, index);
+                container.appendChild(newCard);
+            });
+        }
 
-        showNotification(`💾 Đã xuất ${sentences.length} câu ra file JSON`, 'success');
-    }
+        function createSentenceCard(englishText = '', vietnameseText = '', index = -1) {
+            const newCard = document.createElement('div');
+            newCard.className = 'sentence-card new-card';
+            newCard.dataset.index = index;
 
-    function loadSentencesToContainer(sentences) {
-        const container = document.getElementById('sentences-container');
-        container.innerHTML = '';
+            newCard.innerHTML = `
+        <div class="english-line">
+            <div class="english-text" contenteditable="true" data-placeholder="Nhập câu tiếng Anh...">${englishText}</div>
+            <button class="play-button" onclick="speakText(this)">
+                🔊
+            </button>
+        </div>
+        <div class="vietnamese-text" contenteditable="true" data-placeholder="Nhập nghĩa tiếng Việt...">${vietnameseText}</div>
+       <button class="delete-button" onclick="deleteSentence(this)">
+           🗑️
+       </button>
+   `;
 
-        sentences.forEach((sentence, index) => {
-            const newCard = createSentenceCard(sentence.english, sentence.vietnamese, index);
-            container.appendChild(newCard);
-        });
-    }
+            // Setup placeholder handling
+            handlePlaceholder(newCard.querySelector('.english-text'));
+            handlePlaceholder(newCard.querySelector('.vietnamese-text'));
 
-    function createSentenceCard(englishText = '', vietnameseText = '', index = -1) {
-        const newCard = document.createElement('div');
-        newCard.className = 'sentence-card new-card';
-        newCard.dataset.index = index;
+            // Thêm event listener cho cập nhật real-time
+            const englishInput = newCard.querySelector('.english-text');
+            const vietnameseInput = newCard.querySelector('.vietnamese-text');
 
-        newCard.innerHTML = `
-            <div class="english-line">
-                <div class="english-text" contenteditable="true" data-placeholder="Nhập câu tiếng Anh...">${englishText}</div>
-                <button class="play-button" onclick="speakText(this)">
-                    🔊
-                </button>
-            </div>
-            <div class="vietnamese-text" contenteditable="true" data-placeholder="Nhập nghĩa tiếng Việt...">${vietnameseText}</div>
-           <button class="delete-button" onclick="deleteSentence(this)">
-               🗑️
-           </button>
-       `;
-
-        // Setup placeholder handling
-        handlePlaceholder(newCard.querySelector('.english-text'));
-        handlePlaceholder(newCard.querySelector('.vietnamese-text'));
-
-        // Thêm event listener cho cập nhật real-time
-        const englishInput = newCard.querySelector('.english-text');
-        const vietnameseInput = newCard.querySelector('.vietnamese-text');
-
-        let updateTimeout;
-        const handleUpdate = () => {
-            clearTimeout(updateTimeout);
-            updateTimeout = setTimeout(() => {
-                const cardIndex = parseInt(newCard.dataset.index);
-                if (cardIndex >= 0) {
+            let updateTimeout;
+            const handleUpdate = () => {
+                clearTimeout(updateTimeout);
+                updateTimeout = setTimeout(() => {
+                    // Lấy index hiện tại từ DOM thay vì dùng index cũ
+                    const cardIndex = Array.from(newCard.parentNode.children).indexOf(newCard);
                     updateSentenceInFirebase(
                         cardIndex,
                         englishInput.textContent.trim(),
                         vietnameseInput.textContent.trim()
                     );
-                }
-            }, 1000); // Đợi 1 giây sau khi user ngừng gõ
-        };
-
-        englishInput.addEventListener('input', handleUpdate);
-        vietnameseInput.addEventListener('input', handleUpdate);
-
-        return newCard;
-    }
-
-    // Text-to-Speech với giọng tiếng Anh B1
-    function speakText(button) {
-        const englishText = button.parentElement.querySelector('.english-text').textContent.trim();
-
-        if (englishText && englishText !== 'Nhập câu tiếng Anh...') {
-            speakEnglishText(englishText, button);
-        } else {
-            showNotification('⚠️ Vui lòng nhập câu tiếng Anh trước khi phát âm!', 'error');
-        }
-    }
-
-    function speakEnglishText(text, button = null) {
-        const utterance = new SpeechSynthesisUtterance(text);
-
-        // Cài đặt cho trình độ B1
-        utterance.lang = 'en-US';
-        utterance.rate = 0.8; // Tốc độ chậm hơn cho B1
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        // Thử tìm giọng nói tiếng Anh phù hợp
-        const voices = speechSynthesis.getVoices();
-        const englishVoice = voices.find(voice =>
-            voice.lang.startsWith('en-') && voice.name.includes('Female')
-        ) || voices.find(voice => voice.lang.startsWith('en-'));
-
-        if (englishVoice) {
-            utterance.voice = englishVoice;
-        }
-
-        // Hiệu ứng nút khi đang phát
-        if (button) {
-            button.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
-
-            utterance.onend = function () {
-                button.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+                }, 1000);
             };
+
+            englishInput.addEventListener('input', handleUpdate);
+            vietnameseInput.addEventListener('input', handleUpdate);
+
+            return newCard;
         }
 
-        speechSynthesis.speak(utterance);
-    }
+        // Text-to-Speech với giọng tiếng Anh B1
+        function speakText(button) {
+            const englishText = button.parentElement.querySelector('.english-text').textContent.trim();
 
-    // Chế độ luyện tập
-    function showPracticeMode() {
-        document.getElementById('practice-container').style.display = 'block';
-        document.getElementById('test-container').style.display = 'none';
-        document.getElementById('results-container').style.display = 'none';
-
-        // Cập nhật active button
-        document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    // Chế độ kiểm tra
-    function showTestMode() {
-        const sentences = getAllSentences();
-        if (sentences.length < 5) {
-            showNotification('❌ Cần ít nhất 5 câu để bắt đầu kiểm tra. Vui lòng thêm thêm câu!', 'error');
-            return;
-        }
-
-        document.getElementById('practice-container').style.display = 'none';
-        document.getElementById('test-container').style.display = 'block';
-        document.getElementById('results-container').style.display = 'none';
-
-        // Cập nhật active button
-        document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-
-        // Chuẩn bị bài kiểm tra
-        prepareTest(sentences);
-        
-        // Initialize textarea after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            initializeTextareaResize();
-        }, 100);
-    }
-
-    function getAllSentences() {
-        const sentences = [];
-        const cards = document.querySelectorAll('#sentences-container .sentence-card');
-
-        cards.forEach(card => {
-            const englishText = card.querySelector('.english-text').textContent.trim();
-            const vietnameseText = card.querySelector('.vietnamese-text').textContent.trim();
-
-            if (englishText && englishText !== 'Nhập câu tiếng Anh...' &&
-                vietnameseText && vietnameseText !== 'Nhập nghĩa tiếng Việt...') {
-                sentences.push({
-                    english: englishText,
-                    vietnamese: vietnameseText
-                });
+            if (englishText && englishText !== 'Nhập câu tiếng Anh...') {
+                speakEnglishText(englishText, button);
+            } else {
+                showNotification('⚠️ Vui lòng nhập câu tiếng Anh trước khi phát âm!', 'error');
             }
-        });
-
-        return sentences;
-    }
-
-    function prepareTest(sentences) {
-        // Lấy ngẫu nhiên tối đa 20 câu
-        const shuffled = [...sentences].sort(() => 0.5 - Math.random());
-        testQuestions = shuffled.slice(0, Math.min(20, sentences.length));
-
-        // Reset test state
-        currentQuestionIndex = 0;
-        userAnswers = new Array(testQuestions.length).fill('');
-
-        // Cập nhật UI
-        document.getElementById('total-questions').textContent = testQuestions.length;
-        updateTestQuestion();
-    }
-
-    function updateTestQuestion() {
-        const questionNumber = document.getElementById('question-number');
-        const currentQuestionEl = document.getElementById('current-question');
-        const answerInput = document.getElementById('answer-input');
-        const progressFill = document.getElementById('progress-fill');
-        const prevButton = document.getElementById('prev-button');
-        const nextButton = document.getElementById('next-button');
-        const submitButton = document.getElementById('submit-button');
-
-        questionNumber.textContent = currentQuestionIndex + 1;
-        currentQuestionEl.textContent = currentQuestionIndex + 1;
-        
-        // Load saved answer if exists
-        answerInput.value = userAnswers[currentQuestionIndex] || '';
-        
-        // Auto-resize after setting value
-        setTimeout(() => {
-            autoResizeTextarea(answerInput);
-        }, 10);
-
-        // Update progress
-        const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
-        progressFill.style.width = progress + '%';
-
-        // Update navigation buttons
-        prevButton.disabled = currentQuestionIndex === 0;
-        
-        if (currentQuestionIndex === testQuestions.length - 1) {
-            nextButton.style.display = 'none';
-            submitButton.style.display = 'inline-block';
-        } else {
-            nextButton.style.display = 'inline-block';
-            submitButton.style.display = 'none';
         }
-    }
 
-    function playTestAudio() {
-        if (testQuestions.length > 0) {
-            const currentQuestion = testQuestions[currentQuestionIndex];
-            const textarea = document.getElementById('answer-input');
-            const playButton = document.querySelector('.test-play-button');
-            
-            // Store current focus state
-            const wasFocused = document.activeElement === textarea;
-            const cursorPosition = textarea.selectionStart;
-            
-            // Prevent default behavior that might dismiss keyboard
-            event?.preventDefault();
-            
-            // Sử dụng speakEnglishText thay vì speakText
-            speakEnglishText(currentQuestion.english, playButton);
-            
-            // Restore focus after a delay
+        function speakEnglishText(text, button = null) {
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            // Cài đặt cho trình độ B1
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; // Tốc độ chậm hơn cho B1
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            // Thử tìm giọng nói tiếng Anh phù hợp
+            const voices = speechSynthesis.getVoices();
+            const englishVoice = voices.find(voice =>
+                voice.lang.startsWith('en-') && voice.name.includes('Female')
+            ) || voices.find(voice => voice.lang.startsWith('en-'));
+
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+            }
+
+            // Hiệu ứng nút khi đang phát
+            if (button) {
+                button.style.background = 'linear-gradient(45deg, #27ae60, #2ecc71)';
+
+                utterance.onend = function () {
+                    button.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+                };
+            }
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // Chế độ luyện tập
+        function showPracticeMode() {
+            document.getElementById('practice-container').style.display = 'block';
+            document.getElementById('test-container').style.display = 'none';
+            document.getElementById('results-container').style.display = 'none';
+
+            // Cập nhật active button
+            document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Chế độ kiểm tra
+        function showTestMode() {
+            const sentences = getAllSentences();
+            if (sentences.length < 5) {
+                showNotification('❌ Cần ít nhất 5 câu để bắt đầu kiểm tra. Vui lòng thêm thêm câu!', 'error');
+                return;
+            }
+
+            document.getElementById('practice-container').style.display = 'none';
+            document.getElementById('test-container').style.display = 'block';
+            document.getElementById('results-container').style.display = 'none';
+
+            // Cập nhật active button
+            document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Chuẩn bị bài kiểm tra
+            prepareTest(sentences);
+
+            // Initialize textarea after a short delay to ensure DOM is ready
             setTimeout(() => {
-                if (wasFocused) {
-                    textarea.focus();
-                    textarea.setSelectionRange(cursorPosition, cursorPosition);
-                }
+                initializeTextareaResize();
             }, 100);
         }
-    }
 
-    function previousQuestion() {
-        // Save current answer
-        const answerInput = document.getElementById('answer-input');
-        userAnswers[currentQuestionIndex] = answerInput.value.trim();
+        function getAllSentences() {
+            const sentences = [];
+            const cards = document.querySelectorAll('#sentences-container .sentence-card');
 
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
-            updateTestQuestion();
-        }
-    }
+            cards.forEach(card => {
+                const englishText = card.querySelector('.english-text').textContent.trim();
+                const vietnameseText = card.querySelector('.vietnamese-text').textContent.trim();
 
-    function nextQuestion() {
-        // Save current answer
-        const answerInput = document.getElementById('answer-input');
-        userAnswers[currentQuestionIndex] = answerInput.value.trim();
-
-        if (currentQuestionIndex < testQuestions.length - 1) {
-            currentQuestionIndex++;
-            updateTestQuestion();
-        }
-    }
-
-    function submitTest() {
-        // Lưu câu trả lời cuối cùng
-        userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
-
-        // Tính điểm và hiển thị kết quả
-        calculateAndShowResults();
-    }
-
-    function calculateAndShowResults() {
-        let totalSimilarity = 0;
-        const results = [];
-
-        for (let i = 0; i < testQuestions.length; i++) {
-            const question = testQuestions[i];
-            const userAnswer = userAnswers[i].trim().toLowerCase();
-            const correctAnswer = question.english.toLowerCase();
-
-            // Tính độ chính xác
-            const similarity = calculateSimilarity(userAnswer, correctAnswer);
-            totalSimilarity += similarity;
-
-            // Một câu được coi là đúng nếu >= 80% chính xác
-            const isCorrect = similarity >= 0.8;
-
-            results.push({
-                question: question,
-                userAnswer: userAnswers[i],
-                isCorrect: isCorrect,
-                similarity: similarity
+                if (englishText && englishText !== 'Nhập câu tiếng Anh...' &&
+                    vietnameseText && vietnameseText !== 'Nhập nghĩa tiếng Việt...') {
+                    sentences.push({
+                        english: englishText,
+                        vietnamese: vietnameseText
+                    });
+                }
             });
+
+            return sentences;
         }
 
-        // Tính điểm trung bình từ tổng % chính xác
-        const averageScore = totalSimilarity / testQuestions.length;
+        function prepareTest(sentences) {
+            // Lấy ngẫu nhiên tối đa 20 câu
+            const shuffled = [...sentences].sort(() => 0.5 - Math.random());
+            testQuestions = shuffled.slice(0, Math.min(20, sentences.length));
 
-        showResults(averageScore, results);
-    }
+            // Reset test state
+            currentQuestionIndex = 0;
+            userAnswers = new Array(testQuestions.length).fill('');
 
-    function calculateSimilarity(str1, str2) {
-        const normalized1 = normalizeText(str1);
-        const normalized2 = normalizeText(str2);
+            // Cập nhật UI
+            document.getElementById('total-questions').textContent = testQuestions.length;
+            updateTestQuestion();
+        }
 
-        // Nếu giống hệt nhau
-        if (normalized1 === normalized2) return 1;
+        function updateTestQuestion() {
+            const questionNumber = document.getElementById('question-number');
+            const currentQuestionEl = document.getElementById('current-question');
+            const answerInput = document.getElementById('answer-input');
+            const progressFill = document.getElementById('progress-fill');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const submitButton = document.getElementById('submit-button');
 
-        // Tính similarity bằng cách so sánh từng từ
-        const words1 = normalized1.split(' ');
-        const words2 = normalized2.split(' ');
+            questionNumber.textContent = currentQuestionIndex + 1;
+            currentQuestionEl.textContent = currentQuestionIndex + 1;
 
-        let correctWords = 0;
-        const maxWords = Math.max(words1.length, words2.length);
+            // Load saved answer if exists
+            answerInput.value = userAnswers[currentQuestionIndex] || '';
 
-        // Đếm số từ giống nhau (không cần thứ tự)
-        const words2Copy = [...words2];
-        for (let word of words1) {
-            const index = words2Copy.indexOf(word);
-            if (index !== -1) {
-                correctWords++;
-                words2Copy.splice(index, 1);
+            // Auto-resize after setting value
+            setTimeout(() => {
+                autoResizeTextarea(answerInput);
+            }, 10);
+
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
+            progressFill.style.width = progress + '%';
+
+            // Update navigation buttons
+            prevButton.disabled = currentQuestionIndex === 0;
+
+            if (currentQuestionIndex === testQuestions.length - 1) {
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'inline-block';
+            } else {
+                nextButton.style.display = 'inline-block';
+                submitButton.style.display = 'none';
             }
         }
 
-        return correctWords / maxWords;
-    }
+        function playTestAudio() {
+            if (testQuestions.length > 0) {
+                const currentQuestion = testQuestions[currentQuestionIndex];
+                const textarea = document.getElementById('answer-input');
+                const playButton = document.querySelector('.test-play-button');
 
-    function normalizeText(text) {
-        return text.toLowerCase()
-            .replace(/[^\w\s]/g, '') // Loại bỏ dấu câu
-            .replace(/\s+/g, ' ')    // Chuẩn hóa khoảng trắng
-            .trim();
-    }
+                // Store current focus state
+                const wasFocused = document.activeElement === textarea;
+                const cursorPosition = textarea.selectionStart;
 
-    function showResults(averageScore, results) {
-        document.getElementById('test-container').style.display = 'none';
-        document.getElementById('results-container').style.display = 'block';
+                // Prevent default behavior that might dismiss keyboard
+                event?.preventDefault();
 
-        // Hiển thị điểm số trung bình
-        updateScoreDisplay(averageScore, results);
+                // Sử dụng speakEnglishText thay vì speakText
+                speakEnglishText(currentQuestion.english, playButton);
 
-        // Tạo chi tiết kết quả
-        const resultsDetails = document.getElementById('results-details');
-        resultsDetails.innerHTML = '';
+                // Restore focus after a delay
+                setTimeout(() => {
+                    if (wasFocused) {
+                        textarea.focus();
+                        textarea.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }, 100);
+            }
+        }
 
-        results.forEach((result, index) => {
-            const resultDiv = document.createElement('div');
-            resultDiv.className = `result-item ${result.isCorrect ? 'result-correct' : 'result-incorrect'}`;
+        function previousQuestion() {
+            // Save current answer
+            const answerInput = document.getElementById('answer-input');
+            userAnswers[currentQuestionIndex] = answerInput.value.trim();
 
-            const similarityPercent = Math.round(result.similarity * 100);
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                updateTestQuestion();
+            }
+        }
 
-            resultDiv.innerHTML = `
+        function nextQuestion() {
+            // Save current answer
+            const answerInput = document.getElementById('answer-input');
+            userAnswers[currentQuestionIndex] = answerInput.value.trim();
+
+            if (currentQuestionIndex < testQuestions.length - 1) {
+                currentQuestionIndex++;
+                updateTestQuestion();
+            }
+        }
+
+        function submitTest() {
+            // Lưu câu trả lời cuối cùng
+            userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
+
+            // Tính điểm và hiển thị kết quả
+            calculateAndShowResults();
+        }
+
+        function calculateAndShowResults() {
+            let totalSimilarity = 0;
+            const results = [];
+
+            for (let i = 0; i < testQuestions.length; i++) {
+                const question = testQuestions[i];
+                const userAnswer = userAnswers[i].trim().toLowerCase();
+                const correctAnswer = question.english.toLowerCase();
+
+                // Tính độ chính xác
+                const similarity = calculateSimilarity(userAnswer, correctAnswer);
+                totalSimilarity += similarity;
+
+                // Một câu được coi là đúng nếu >= 80% chính xác
+                const isCorrect = similarity >= 0.8;
+
+                results.push({
+                    question: question,
+                    userAnswer: userAnswers[i],
+                    isCorrect: isCorrect,
+                    similarity: similarity
+                });
+            }
+
+            // Tính điểm trung bình từ tổng % chính xác
+            const averageScore = totalSimilarity / testQuestions.length;
+
+            showResults(averageScore, results);
+        }
+
+        function calculateSimilarity(str1, str2) {
+            const normalized1 = normalizeText(str1);
+            const normalized2 = normalizeText(str2);
+
+            // Nếu giống hệt nhau
+            if (normalized1 === normalized2) return 1;
+
+            // Tính similarity bằng cách so sánh từng từ
+            const words1 = normalized1.split(' ');
+            const words2 = normalized2.split(' ');
+
+            let correctWords = 0;
+            const maxWords = Math.max(words1.length, words2.length);
+
+            // Đếm số từ giống nhau (không cần thứ tự)
+            const words2Copy = [...words2];
+            for (let word of words1) {
+                const index = words2Copy.indexOf(word);
+                if (index !== -1) {
+                    correctWords++;
+                    words2Copy.splice(index, 1);
+                }
+            }
+
+            return correctWords / maxWords;
+        }
+
+        function normalizeText(text) {
+            return text.toLowerCase()
+                .replace(/[^\w\s]/g, '') // Loại bỏ dấu câu
+                .replace(/\s+/g, ' ')    // Chuẩn hóa khoảng trắng
+                .trim();
+        }
+
+        function showResults(averageScore, results) {
+            document.getElementById('test-container').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+
+            // Hiển thị điểm số trung bình
+            updateScoreDisplay(averageScore, results);
+
+            // Tạo chi tiết kết quả
+            const resultsDetails = document.getElementById('results-details');
+            resultsDetails.innerHTML = '';
+
+            results.forEach((result, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `result-item ${result.isCorrect ? 'result-correct' : 'result-incorrect'}`;
+
+                const similarityPercent = Math.round(result.similarity * 100);
+
+                resultDiv.innerHTML = `
         <div class="result-question">Câu ${index + 1}: ${result.question.vietnamese}</div>
         <div class="result-answer">
             <strong>Bạn viết:</strong> 
@@ -1372,326 +1389,362 @@
         </div>
     `;
 
-            resultsDetails.appendChild(resultDiv);
-        });
-    }
+                resultsDetails.appendChild(resultDiv);
+            });
+        }
 
-    function getScoreColor(percentage) {
-        if (percentage >= 90) return '#27ae60';  // Xanh lá
-        if (percentage >= 80) return '#f39c12';  // Cam
-        if (percentage >= 70) return '#e67e22';  // Cam đậm
-        return '#e74c3c';  // Đỏ
-    }
+        function getScoreColor(percentage) {
+            if (percentage >= 90) return '#27ae60';  // Xanh lá
+            if (percentage >= 80) return '#f39c12';  // Cam
+            if (percentage >= 70) return '#e67e22';  // Cam đậm
+            return '#e74c3c';  // Đỏ
+        }
 
-    function updateScoreDisplay(averageScore, results) {
-        const percentage = averageScore * 100;
-        const scoreElement = document.getElementById('score-display');
+        function updateScoreDisplay(averageScore, results) {
+            const percentage = averageScore * 100;
+            const scoreElement = document.getElementById('score-display');
 
-        // Hiển thị điểm trung bình
-        scoreElement.textContent = `${Math.round(percentage)}%`;
-        scoreElement.style.color = getScoreColor(percentage);
+            // Hiển thị điểm trung bình
+            scoreElement.textContent = `${Math.round(percentage)}%`;
+            scoreElement.style.color = getScoreColor(percentage);
 
-        // Đếm số câu đúng (>= 80%) để hiển thị thêm
-        const correctCount = results.filter(r => r.isCorrect).length;
+            // Đếm số câu đúng (>= 80%) để hiển thị thêm
+            const correctCount = results.filter(r => r.isCorrect).length;
 
-        // Thêm text mô tả
-        const scoreText = document.querySelector('.score-text');
-        let description = '';
+            // Thêm text mô tả
+            const scoreText = document.querySelector('.score-text');
+            let description = '';
 
-        if (percentage >= 90) description = 'Xuất sắc! 🎉';
-        else if (percentage >= 80) description = 'Tốt! 👍';
-        else if (percentage >= 70) description = 'Khá! 👌';
-        else if (percentage >= 60) description = 'Trung bình 😐';
-        else description = 'Cần cố gắng thêm! 💪';
+            if (percentage >= 90) description = 'Xuất sắc! 🎉';
+            else if (percentage >= 80) description = 'Tốt! 👍';
+            else if (percentage >= 70) description = 'Khá! 👌';
+            else if (percentage >= 60) description = 'Trung bình 😐';
+            else description = 'Cần cố gắng thêm! 💪';
 
-        scoreText.innerHTML = `Điểm trung bình: ${Math.round(percentage)}%<br>
+            scoreText.innerHTML = `Điểm trung bình: ${Math.round(percentage)}%<br>
                       <small>Câu đúng: ${correctCount}/${results.length} - ${description}</small>`;
-    }
+        }
 
-    function retakeTest() {
-        showTestMode();
-    }
+        function retakeTest() {
+            showTestMode();
+        }
 
-    // Thêm câu mới (sử dụng Firebase)
-    async function addNewSentence() {
-        const container = document.getElementById('sentences-container');
-        
-        // Tạm thời thêm card trống để user thấy
-        const newCard = createSentenceCard('', '', getAllSentences().length);
-        container.appendChild(newCard);
+        // Thêm câu mới (sử dụng Firebase)
+        // Thêm câu mới (sử dụng Firebase) - Thêm ở đầu
+        async function addNewSentence() {
+            const container = document.getElementById('sentences-container');
 
-        // Cuộn đến thẻ mới và focus vào ô tiếng Anh
-        setTimeout(() => {
-            newCard.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
+            // Tạm thời thêm card trống ở đầu để user thấy
+            const newCard = createSentenceCard('', '', 0); // Index 0 cho vị trí đầu
+            container.insertBefore(newCard, container.firstChild); // Thêm ở đầu thay vì appendChild
+
+            // Cập nhật lại index cho tất cả các card
+            updateAllCardIndexes();
+
+            // Cuộn đến thẻ mới và focus vào ô tiếng Anh
+            setTimeout(() => {
+                newCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                const englishInput = newCard.querySelector('.english-text');
+                englishInput.focus();
+            }, 100);
+
+            // Thêm vào Firebase (ở đầu mảng)
+            await addNewSentenceToFirebaseAtTop('', '');
+        }
+
+
+        // Thêm câu mới trực tiếp lên Firebase ở đầu
+        async function addNewSentenceToFirebaseAtTop(english = '', vietnamese = '') {
+            try {
+                const currentSentences = getAllSentences();
+                const newSentence = { english, vietnamese };
+                const updatedSentences = [newSentence, ...currentSentences]; // Thêm ở đầu mảng
+
+                await db.collection('sentences').doc('user_data').set({
+                    sentences: updatedSentences,
+                    lastUpdated: new Date(),
+                    count: updatedSentences.length
+                });
+
+            } catch (error) {
+                console.error('❌ Add sentence error:', error);
+                showNotification('❌ Lỗi thêm câu mới', 'error');
+            }
+        }
+
+        // Cập nhật lại index cho tất cả các card sau khi thêm/xóa
+        function updateAllCardIndexes() {
+            const cards = document.querySelectorAll('#sentences-container .sentence-card');
+            cards.forEach((card, index) => {
+                card.dataset.index = index;
+            });
+        }
+
+        // Xóa câu (sử dụng Firebase)
+        // Xóa câu (sử dụng Firebase)
+        async function deleteSentence(button) {
+            if (confirm('Bạn có chắc muốn xóa câu này không?')) {
+                const card = button.parentElement;
+                // Lấy index hiện tại từ vị trí trong DOM
+                const index = Array.from(card.parentNode.children).indexOf(card);
+
+                card.style.animation = 'slideOut 0.3s ease';
+
+                setTimeout(async () => {
+                    await deleteSentenceFromFirebase(index);
+                    // Sau khi xóa, cập nhật lại index cho các card còn lại
+                    updateAllCardIndexes();
+                }, 300);
+            }
+        }
+
+        // Xử lý placeholder cho các ô nhập liệu
+        function handlePlaceholder(element) {
+            const placeholder = element.getAttribute('data-placeholder');
+
+            element.addEventListener('focus', function () {
+                if (this.textContent.trim() === '' || this.textContent === placeholder) {
+                    this.textContent = '';
+                    this.style.color = '#2c3e50';
+                }
             });
 
-            const englishInput = newCard.querySelector('.english-text');
-            englishInput.focus();
-        }, 100);
-
-        // Thêm vào Firebase
-        await addNewSentenceToFirebase('', '');
-    }
-
-    // Xóa câu (sử dụng Firebase)
-    async function deleteSentence(button) {
-        if (confirm('Bạn có chắc muốn xóa câu này không?')) {
-            const card = button.parentElement;
-            const index = parseInt(card.dataset.index);
-            
-            card.style.animation = 'slideOut 0.3s ease';
-
-            setTimeout(async () => {
-                await deleteSentenceFromFirebase(index);
-            }, 300);
-        }
-    }
-
-    // Xử lý placeholder cho các ô nhập liệu
-    function handlePlaceholder(element) {
-        const placeholder = element.getAttribute('data-placeholder');
-
-        element.addEventListener('focus', function () {
-            if (this.textContent.trim() === '' || this.textContent === placeholder) {
-                this.textContent = '';
-                this.style.color = '#2c3e50';
-            }
-        });
-
-        element.addEventListener('blur', function () {
-            if (this.textContent.trim() === '') {
-                this.textContent = '';
-                this.style.color = '#bdc3c7';
-            }
-        });
-
-        // Hiển thị placeholder ban đầu
-        if (element.textContent.trim() === '') {
-            element.style.color = '#bdc3c7';
-        }
-    }
-
-    // Local Storage functions (chỉ dùng để backup)
-    function saveToLocalStorage() {
-        const sentences = getAllSentences();
-        localStorage.setItem('englishLearningData', JSON.stringify(sentences));
-    }
-
-    function loadFromLocalStorage() {
-        const savedData = localStorage.getItem('englishLearningData');
-        if (savedData) {
-            try {
-                const sentences = JSON.parse(savedData);
-                if (Array.isArray(sentences) && sentences.length > 0) {
-                    loadSentencesToContainer(sentences);
-                    return true;
+            element.addEventListener('blur', function () {
+                if (this.textContent.trim() === '') {
+                    this.textContent = '';
+                    this.style.color = '#bdc3c7';
                 }
-            } catch (error) {
-                console.error('Error loading from localStorage:', error);
+            });
+
+            // Hiển thị placeholder ban đầu
+            if (element.textContent.trim() === '') {
+                element.style.color = '#bdc3c7';
             }
         }
-        return false;
-    }
 
-    // Thêm câu mẫu để demo
-    function addSampleSentences() {
-        const sampleSentences = [
-            {
-                english: "Hello, how are you today?",
-                vietnamese: "Xin chào, hôm nay bạn thế nào?"
-            },
-            {
-                english: "What time is it now?",
-                vietnamese: "Bây giờ là mấy giờ?"
-            },
-            {
-                english: "I love reading books in my free time.",
-                vietnamese: "Tôi thích đọc sách trong thời gian rảnh."
-            },
-            {
-                english: "The weather is beautiful today.",
-                vietnamese: "Thời tiết hôm nay thật đẹp."
-            },
-            {
-                english: "Can you help me with this problem?",
-                vietnamese: "Bạn có thể giúp tôi giải quyết vấn đề này không?"
+        // Local Storage functions (chỉ dùng để backup)
+        function saveToLocalStorage() {
+            const sentences = getAllSentences();
+            localStorage.setItem('englishLearningData', JSON.stringify(sentences));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('englishLearningData');
+            if (savedData) {
+                try {
+                    const sentences = JSON.parse(savedData);
+                    if (Array.isArray(sentences) && sentences.length > 0) {
+                        loadSentencesToContainer(sentences);
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error loading from localStorage:', error);
+                }
             }
-        ];
+            return false;
+        }
 
-        return sampleSentences;
-    }
+        // Thêm câu mẫu để demo
+        function addSampleSentences() {
+            const sampleSentences = [
+                {
+                    english: "Hello, how are you today?",
+                    vietnamese: "Xin chào, hôm nay bạn thế nào?"
+                },
+                {
+                    english: "What time is it now?",
+                    vietnamese: "Bây giờ là mấy giờ?"
+                },
+                {
+                    english: "I love reading books in my free time.",
+                    vietnamese: "Tôi thích đọc sách trong thời gian rảnh."
+                },
+                {
+                    english: "The weather is beautiful today.",
+                    vietnamese: "Thời tiết hôm nay thật đẹp."
+                },
+                {
+                    english: "Can you help me with this problem?",
+                    vietnamese: "Bạn có thể giúp tôi giải quyết vấn đề này không?"
+                }
+            ];
 
-   // Hàm khởi tạo app - improved version
-   async function initializeApp() {
-       console.log('🚀 Initializing app...');
-       
-       // Load voices khi trang web được tải
-       speechSynthesis.getVoices();
-       
-       // Đảm bảo voices được load (một số browser cần thời gian)
-       if (speechSynthesis.onvoiceschanged !== undefined) {
-           speechSynthesis.onvoiceschanged = () => {
-               speechSynthesis.getVoices();
-           };
-       }
+            return sampleSentences;
+        }
 
-       try {
-           // Thử kết nối Firebase và setup real-time listener
-           console.log('⏳ Setting up Firebase real-time connection...');
-           setupRealtimeListener();
-           
-           // Thử load dữ liệu từ Firebase
-           const firebaseLoadSuccess = await loadFromFirebase();
-           
-           if (firebaseLoadSuccess) {
-               console.log('✅ Loaded from Firebase successfully');
-               showNotification('📥 Đã tải dữ liệu từ cloud', 'success');
-           } else {
-               console.log('❌ No data in Firebase, trying localStorage...');
-               
-               // Nếu Firebase không có dữ liệu, thử localStorage
-               const localStorageLoadSuccess = loadFromLocalStorage();
-               
-               if (localStorageLoadSuccess) {
-                   console.log('✅ Loaded from localStorage');
-                   showNotification('📱 Đã tải dữ liệu từ bộ nhớ máy', 'info');
-                   
-                   // Upload dữ liệu từ localStorage lên Firebase
-                   await saveToFirebase();
-               } else {
-                   console.log('ℹ️ No saved data found, loading sample sentences');
-                   
-                   // Tải câu mẫu lên Firebase
-                   const sampleSentences = addSampleSentences();
-                   await db.collection('sentences').doc('user_data').set({
-                       sentences: sampleSentences,
-                       lastUpdated: new Date(),
-                       count: sampleSentences.length
-                   });
-                   
-                   showNotification('🎯 Đã tải dữ liệu mẫu', 'info');
-               }
-           }
-           
-       } catch (error) {
-           console.error('❌ Firebase initialization failed:', error);
-           updateConnectionStatus(false);
-           
-           // Fallback sang localStorage
-           const localStorageLoadSuccess = loadFromLocalStorage();
-           if (localStorageLoadSuccess) {
-               showNotification('📱 Đã tải từ bộ nhớ máy (offline)', 'info');
-           } else {
-               loadSentencesToContainer(addSampleSentences());
-               showNotification('🎯 Chế độ offline - dữ liệu mẫu', 'info');
-           }
-       }
-   }
+        // Hàm khởi tạo app - improved version
+        async function initializeApp() {
+            console.log('🚀 Initializing app...');
 
-   // Auto-resize textarea function
-   function autoResizeTextarea(textarea) {
-       textarea.style.height = 'auto';
-       textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-   }
+            // Load voices khi trang web được tải
+            speechSynthesis.getVoices();
 
-   // Initialize textarea auto-resize
-   function initializeTextareaResize() {
-       const textarea = document.getElementById('answer-input');
-       if (textarea) {
-           textarea.addEventListener('input', function() {
-               autoResizeTextarea(this);
-           });
-           
-           // Initial resize
-           autoResizeTextarea(textarea);
-       }
-   }
+            // Đảm bảo voices được load (một số browser cần thời gian)
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    speechSynthesis.getVoices();
+                };
+            }
 
-   // Event Listeners
-   document.addEventListener('keydown', function (e) {
-       if (e.ctrlKey && e.key === 'b') {
-           e.preventDefault();
+            try {
+                // Thử kết nối Firebase và setup real-time listener
+                console.log('⏳ Setting up Firebase real-time connection...');
+                setupRealtimeListener();
 
-           const selection = window.getSelection();
-           if (selection.toString().length > 0) {
-               document.execCommand('bold');
-           }
-       }
+                // Thử load dữ liệu từ Firebase
+                const firebaseLoadSuccess = await loadFromFirebase();
 
-       // Enter để chuyển câu tiếp theo trong test
-       if (e.key === 'Enter' && document.getElementById('test-container').style.display === 'block') {
-           e.preventDefault();
-           if (currentQuestionIndex < testQuestions.length - 1) {
-               nextQuestion();
-           } else {
-               submitTest();
-           }
-       }
+                if (firebaseLoadSuccess) {
+                    console.log('✅ Loaded from Firebase successfully');
+                    showNotification('📥 Đã tải dữ liệu từ cloud', 'success');
+                } else {
+                    console.log('❌ No data in Firebase, trying localStorage...');
 
-       // Keyboard shortcuts
-       if (e.ctrlKey && e.key === 't') {
-           e.preventDefault();
-           showTestMode();
-       }
+                    // Nếu Firebase không có dữ liệu, thử localStorage
+                    const localStorageLoadSuccess = loadFromLocalStorage();
 
-       if (e.ctrlKey && e.key === 'p') {
-           e.preventDefault();
-           showPracticeMode();
-       }
+                    if (localStorageLoadSuccess) {
+                        console.log('✅ Loaded from localStorage');
+                        showNotification('📱 Đã tải dữ liệu từ bộ nhớ máy', 'info');
 
-       if (e.ctrlKey && e.key === 'n') {
-           e.preventDefault();
-           if (document.getElementById('practice-container').style.display !== 'none') {
-               addNewSentence();
-           }
-       }
+                        // Upload dữ liệu từ localStorage lên Firebase
+                        await saveToFirebase();
+                    } else {
+                        console.log('ℹ️ No saved data found, loading sample sentences');
 
-       // Import/Export shortcuts
-       if (e.ctrlKey && e.key === 'i') {
-           e.preventDefault();
-           showImportModal();
-       }
+                        // Tải câu mẫu lên Firebase
+                        const sampleSentences = addSampleSentences();
+                        await db.collection('sentences').doc('user_data').set({
+                            sentences: sampleSentences,
+                            lastUpdated: new Date(),
+                            count: sampleSentences.length
+                        });
 
-       if (e.ctrlKey && e.key === 'e') {
-           e.preventDefault();
-           exportToJSON();
-       }
-   });
+                        showNotification('🎯 Đã tải dữ liệu mẫu', 'info');
+                    }
+                }
 
-   // Xử lý paste text
-   document.addEventListener('paste', function (e) {
-       const target = e.target;
-       if (target.contentEditable === 'true') {
-           e.preventDefault();
-           const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-           document.execCommand('insertText', false, text);
-       }
-   });
+            } catch (error) {
+                console.error('❌ Firebase initialization failed:', error);
+                updateConnectionStatus(false);
 
-   // Close modal when clicking outside
-   document.addEventListener('click', function (e) {
-       const modal = document.getElementById('import-modal');
-       if (e.target === modal) {
-           closeImportModal();
-       }
-   });
+                // Fallback sang localStorage
+                const localStorageLoadSuccess = loadFromLocalStorage();
+                if (localStorageLoadSuccess) {
+                    showNotification('📱 Đã tải từ bộ nhớ máy (offline)', 'info');
+                } else {
+                    loadSentencesToContainer(addSampleSentences());
+                    showNotification('🎯 Chế độ offline - dữ liệu mẫu', 'info');
+                }
+            }
+        }
 
-   // Network status listeners
-   window.addEventListener('online', function() {
-       console.log('🌐 Network back online, setting up Firebase...');
-       setupRealtimeListener();
-   });
+        // Auto-resize textarea function
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        }
 
-   window.addEventListener('offline', function() {
-       console.log('📵 Network offline');
-       updateConnectionStatus(false);
-   });
+        // Initialize textarea auto-resize
+        function initializeTextareaResize() {
+            const textarea = document.getElementById('answer-input');
+            if (textarea) {
+                textarea.addEventListener('input', function () {
+                    autoResizeTextarea(this);
+                });
 
-   // CSS cho animation slideOut
-   const style = document.createElement('style');
-   style.textContent = `
+                // Initial resize
+                autoResizeTextarea(textarea);
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+
+                const selection = window.getSelection();
+                if (selection.toString().length > 0) {
+                    document.execCommand('bold');
+                }
+            }
+
+            // Enter để chuyển câu tiếp theo trong test
+            if (e.key === 'Enter' && document.getElementById('test-container').style.display === 'block') {
+                e.preventDefault();
+                if (currentQuestionIndex < testQuestions.length - 1) {
+                    nextQuestion();
+                } else {
+                    submitTest();
+                }
+            }
+
+            // Keyboard shortcuts
+            if (e.ctrlKey && e.key === 't') {
+                e.preventDefault();
+                showTestMode();
+            }
+
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                showPracticeMode();
+            }
+
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                if (document.getElementById('practice-container').style.display !== 'none') {
+                    addNewSentence();
+                }
+            }
+
+            // Import/Export shortcuts
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                showImportModal();
+            }
+
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                exportToJSON();
+            }
+        });
+
+        // Xử lý paste text
+        document.addEventListener('paste', function (e) {
+            const target = e.target;
+            if (target.contentEditable === 'true') {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                document.execCommand('insertText', false, text);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function (e) {
+            const modal = document.getElementById('import-modal');
+            if (e.target === modal) {
+                closeImportModal();
+            }
+        });
+
+        // Network status listeners
+        window.addEventListener('online', function () {
+            console.log('🌐 Network back online, setting up Firebase...');
+            setupRealtimeListener();
+        });
+
+        window.addEventListener('offline', function () {
+            console.log('📵 Network offline');
+            updateConnectionStatus(false);
+        });
+
+        // CSS cho animation slideOut
+        const style = document.createElement('style');
+        style.textContent = `
       @keyframes slideIn {
           from {
               opacity: 0;
@@ -1738,79 +1791,79 @@
           color: white;
       }
   `;
-   document.head.appendChild(style);
+        document.head.appendChild(style);
 
-   // Khởi tạo khi trang web được tải
-   document.addEventListener('DOMContentLoaded', initializeApp);
+        // Khởi tạo khi trang web được tải
+        document.addEventListener('DOMContentLoaded', initializeApp);
 
-   // Visibility change listener - kiểm tra kết nối khi user quay lại tab
-   document.addEventListener('visibilitychange', function() {
-       if (!document.hidden && !firebaseConnected) {
-           console.log('👀 User returned to tab, checking Firebase connection...');
-           setupRealtimeListener();
-       }
-   });
+        // Visibility change listener - kiểm tra kết nối khi user quay lại tab
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden && !firebaseConnected) {
+                console.log('👀 User returned to tab, checking Firebase connection...');
+                setupRealtimeListener();
+            }
+        });
 
-   // Before unload - save data before user leaves (backup)
-   window.addEventListener('beforeunload', function(e) {
-       // Lưu vào localStorage để backup
-       saveToLocalStorage();
-       
-       // Cleanup real-time listener
-       if (unsubscribe) {
-           unsubscribe();
-       }
-   });
+        // Before unload - save data before user leaves (backup)
+        window.addEventListener('beforeunload', function (e) {
+            // Lưu vào localStorage để backup
+            saveToLocalStorage();
 
-   // Error handling và logging
-   window.addEventListener('error', function(e) {
-       console.error('❌ JavaScript Error:', e.error);
-       showNotification('⚠️ Đã xảy ra lỗi, vui lòng tải lại trang', 'error');
-   });
+            // Cleanup real-time listener
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        });
 
-   window.addEventListener('unhandledrejection', function(e) {
-       console.error('❌ Unhandled Promise Rejection:', e.reason);
-       // Không hiển thị notification cho promise rejection để tránh spam
-   });
+        // Error handling và logging
+        window.addEventListener('error', function (e) {
+            console.error('❌ JavaScript Error:', e.error);
+            showNotification('⚠️ Đã xảy ra lỗi, vui lòng tải lại trang', 'error');
+        });
 
-   // Health check function
-   function performHealthCheck() {
-       const healthStatus = {
-           localStorage: false,
-           firebase: firebaseConnected,
-           speechSynthesis: 'speechSynthesis' in window,
-           dataIntegrity: false,
-           realtimeListener: unsubscribe !== null
-       };
+        window.addEventListener('unhandledrejection', function (e) {
+            console.error('❌ Unhandled Promise Rejection:', e.reason);
+            // Không hiển thị notification cho promise rejection để tránh spam
+        });
 
-       // Check localStorage
-       try {
-           localStorage.setItem('health-check', 'test');
-           localStorage.removeItem('health-check');
-           healthStatus.localStorage = true;
-       } catch (e) {
-           healthStatus.localStorage = false;
-       }
+        // Health check function
+        function performHealthCheck() {
+            const healthStatus = {
+                localStorage: false,
+                firebase: firebaseConnected,
+                speechSynthesis: 'speechSynthesis' in window,
+                dataIntegrity: false,
+                realtimeListener: unsubscribe !== null
+            };
 
-       // Check data integrity
-       const sentences = getAllSentences();
-       healthStatus.dataIntegrity = sentences.length > 0;
+            // Check localStorage
+            try {
+                localStorage.setItem('health-check', 'test');
+                localStorage.removeItem('health-check');
+                healthStatus.localStorage = true;
+            } catch (e) {
+                healthStatus.localStorage = false;
+            }
 
-       console.log('🏥 Health Check:', healthStatus);
-       
-       // Nếu mất kết nối Firebase, thử kết nối lại
-       if (!firebaseConnected) {
-           console.log('🔄 Firebase disconnected, attempting reconnection...');
-           setupRealtimeListener();
-       }
+            // Check data integrity
+            const sentences = getAllSentences();
+            healthStatus.dataIntegrity = sentences.length > 0;
 
-       return healthStatus;
-   }
+            console.log('🏥 Health Check:', healthStatus);
 
-   // Chạy health check mỗi 30 giây
-   setInterval(performHealthCheck, 30 * 1000);
-</script>
-   
+            // Nếu mất kết nối Firebase, thử kết nối lại
+            if (!firebaseConnected) {
+                console.log('🔄 Firebase disconnected, attempting reconnection...');
+                setupRealtimeListener();
+            }
+
+            return healthStatus;
+        }
+
+        // Chạy health check mỗi 30 giây
+        setInterval(performHealthCheck, 30 * 1000);
+    </script>
+
 </body>
 
 </html>
