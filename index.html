@@ -568,6 +568,21 @@
                 padding: 20px;
             }
         }
+        .answer-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    max-height: 200px;
+    line-height: 1.4;
+}
     </style>
 </head>
 
@@ -631,8 +646,8 @@
                 <button class="test-play-button" onclick="playTestAudio()">
                     🔊
                 </button>
-                <input type="text" class="answer-input" id="answer-input"
-                    placeholder="Nhập câu tiếng Anh bạn nghe được...">
+                <textarea class="answer-input" id="answer-input" rows="2"
+    placeholder="Nhập câu tiếng Anh bạn nghe được..."></textarea>
 
                 <div class="test-navigation">
                     <button class="nav-button" id="prev-button" onclick="previousQuestion()" disabled>
@@ -1140,23 +1155,40 @@
     }
 
     function updateTestQuestion() {
-        const question = testQuestions[currentQuestionIndex];
+    const questionNumber = document.getElementById('question-number');
+    const currentQuestionEl = document.getElementById('current-question');
+    const answerInput = document.getElementById('answer-input');
+    const progressFill = document.getElementById('progress-fill');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const submitButton = document.getElementById('submit-button');
 
-        document.getElementById('current-question').textContent = currentQuestionIndex + 1;
-        document.getElementById('question-number').textContent = currentQuestionIndex + 1;
-        document.getElementById('answer-input').value = userAnswers[currentQuestionIndex];
+    questionNumber.textContent = currentQuestionIndex + 1;
+    currentQuestionEl.textContent = currentQuestionIndex + 1;
+    
+    // Load saved answer if exists
+    answerInput.value = userAnswers[currentQuestionIndex] || '';
+    
+    // Auto-resize after setting value
+    setTimeout(() => {
+        autoResizeTextarea(answerInput);
+    }, 10);
 
-        // Cập nhật progress bar
-        const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
-        document.getElementById('progress-fill').style.width = progress + '%';
+    // Update progress
+    const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
+    progressFill.style.width = progress + '%';
 
-        // Cập nhật navigation buttons
-        document.getElementById('prev-button').disabled = currentQuestionIndex === 0;
-        document.getElementById('next-button').style.display =
-            currentQuestionIndex === testQuestions.length - 1 ? 'none' : 'block';
-        document.getElementById('submit-button').style.display =
-            currentQuestionIndex === testQuestions.length - 1 ? 'block' : 'none';
+    // Update navigation buttons
+    prevButton.disabled = currentQuestionIndex === 0;
+    
+    if (currentQuestionIndex === testQuestions.length - 1) {
+        nextButton.style.display = 'none';
+        submitButton.style.display = 'inline-block';
+    } else {
+        nextButton.style.display = 'inline-block';
+        submitButton.style.display = 'none';
     }
+}
 
     function playTestAudio() {
         const question = testQuestions[currentQuestionIndex];
@@ -1165,22 +1197,26 @@
     }
 
     function previousQuestion() {
-        if (currentQuestionIndex > 0) {
-            // Lưu câu trả lời hiện tại
-            userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
-            currentQuestionIndex--;
-            updateTestQuestion();
-        }
+    // Save current answer
+    const answerInput = document.getElementById('answer-input');
+    userAnswers[currentQuestionIndex] = answerInput.value.trim();
+
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        updateTestQuestion();
     }
+}
 
     function nextQuestion() {
-        if (currentQuestionIndex < testQuestions.length - 1) {
-            // Lưu câu trả lời hiện tại
-            userAnswers[currentQuestionIndex] = document.getElementById('answer-input').value;
-            currentQuestionIndex++;
-            updateTestQuestion();
-        }
+    // Save current answer
+    const answerInput = document.getElementById('answer-input');
+    userAnswers[currentQuestionIndex] = answerInput.value.trim();
+
+    if (currentQuestionIndex < testQuestions.length - 1) {
+        currentQuestionIndex++;
+        updateTestQuestion();
     }
+}
 
     function submitTest() {
         // Lưu câu trả lời cuối cùng
@@ -1749,6 +1785,78 @@
     // Chạy health check mỗi 5 phút
     setInterval(performHealthCheck, 5 * 60 * 1000);
     
+
+    // Auto-resize textarea function
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+}
+
+// Initialize textarea auto-resize
+function initializeTextareaResize() {
+    const textarea = document.getElementById('answer-input');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+        
+        // Initial resize
+        autoResizeTextarea(textarea);
+    }
+}
+
+// Modified playTestAudio function to prevent keyboard dismissal
+function playTestAudio() {
+    if (testQuestions.length > 0) {
+        const currentQuestion = testQuestions[currentQuestionIndex];
+        const textarea = document.getElementById('answer-input');
+        const playButton = document.querySelector('.test-play-button'); // Lấy button element
+        
+        // Store current focus state
+        const wasFocused = document.activeElement === textarea;
+        const cursorPosition = textarea.selectionStart;
+        
+        // Prevent default behavior that might dismiss keyboard
+        event?.preventDefault();
+        
+        // Sử dụng speakEnglishText thay vì speakText
+        speakEnglishText(currentQuestion.english, playButton);
+        
+        // Restore focus after a delay
+        setTimeout(() => {
+            if (wasFocused) {
+                textarea.focus();
+                textarea.setSelectionRange(cursorPosition, cursorPosition);
+            }
+        }, 100);
+    }
+}
+
+// Update the showTestMode function to initialize textarea
+function showTestMode() {
+    const sentences = getAllSentences(); // Thêm dòng này để lấy danh sách câu
+    
+    if (sentences.length < 5) {
+        showNotification('❌ Cần ít nhất 5 câu để bắt đầu kiểm tra. Vui lòng thêm thêm câu!', 'error');
+        return;
+    }
+
+    document.getElementById('practice-container').style.display = 'none';
+    document.getElementById('test-container').style.display = 'block';
+    document.getElementById('results-container').style.display = 'none';
+
+    // Cập nhật active button
+    document.querySelectorAll('.mode-button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Chuẩn bị bài kiểm tra
+    prepareTest(sentences);
+    
+    // Initialize textarea after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        initializeTextareaResize();
+    }, 100);
+}
 </script>
 
    
