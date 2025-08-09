@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luyện Listening Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%236366f1'/><text x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='50' fill='white'>🎧</text></svg>">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%236366f1'/><text x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='50' fill='white'>🎧</text></svg>">
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%236366f1'/><text x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='50' fill='white'>🎧</text></svg>">
+    <link rel="manifest" href="site.webmanifest">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -215,7 +220,7 @@
             gap: 8px;
             text-decoration: none;
         }
-
+z
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
@@ -531,677 +536,736 @@
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-headphones"></i> Luyện Listening Pro</h1>
-            <p>Nâng cao kỹ năng nghe tiếng Anh cùng Hz Chong - Chuẩn B1</p>
-        </div>
-
-        <div class="tab-container">
-            <button class="tab active" onclick="showTab('practice')">
-                <i class="fas fa-book-open"></i> Luyện Tập
-            </button>
-            <button class="tab" onclick="showTab('test')">
-                <i class="fas fa-clipboard-check"></i> Kiểm Tra
-            </button>
-        </div>
-
-        <div class="content">
-            <!-- Practice Section -->
-            <div id="practice" class="section active">
-                <h2 class="section-title">
-                    <i class="fas fa-book-open"></i> Luyện Tập
-                </h2>
-
-                <div class="stats-card">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalCards">0</span>
-                        <span class="stat-label">Tổng số thẻ</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="todayCards">0</span>
-                        <span class="stat-label">Thẻ hôm nay</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="lastScore">0</span>
-                        <span class="stat-label">Điểm gần nhất</span>
-                    </div>
-                </div>
-
-                <div class="add-card-form">
-                    <h3><i class="fas fa-plus-circle"></i> Thêm thẻ mới</h3>
-                    <div class="form-group">
-                        <label><i class="fas fa-globe-americas"></i> Tiếng Anh:</label>
-                        <input type="text" id="englishInput" placeholder="Nhập câu tiếng Anh...">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-language"></i> Tiếng Việt:</label>
-                        <input type="text" id="vietnameseInput" placeholder="Nhập nghĩa tiếng Việt...">
-                    </div>
-                    <button class="btn" onclick="addCard()">
-                        <i class="fas fa-plus"></i> Thêm Thẻ
-                    </button>
-                </div>
-
-                <div class="cards-container">
-                    <div class="cards-header">
-                        <h3>Danh sách thẻ</h3>
-                        <div class="card-count" id="cardCount">0 thẻ</div>
-                    </div>
-                    <div id="cardsList">
-                        <div class="loading">
-                            <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Test Section -->
-            <div id="test" class="section">
-                <h2 class="section-title">
-                    <i class="fas fa-clipboard-check"></i> Kiểm Tra B1
-                </h2>
-
-                <div id="testStart" class="test-container">
-                    <div class="test-info">
-                        <h3><i class="fas fa-target"></i> Bài kiểm tra nghe B1</h3>
-                        <p>Bạn sẽ nghe 10 câu tiếng Anh ngẫu nhiên với <strong>4 giọng nói chuẩn B1</strong> 
-                        (2 nam, 2 nữ, tốc độ phù hợp trình độ B1) và nhập lại những gì bạn nghe được.</p>
-                        
-                        <p><strong>Đặc biệt:</strong> Hệ thống sử dụng 4 giọng nói được tối ưu riêng cho học viên B1 
-                        với tốc độ và độ rõ nét phù hợp.</p>
-                        <div id="voiceInfo"
-                            style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.7); border-radius: 12px; font-size: 0.9rem; border: 1px solid rgba(99,102,241,0.2);">
-                            <i class="fas fa-microphone"></i> <span id="voiceCount">Đang tải hệ thống giọng nói B1...</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="startTest()" id="startTestBtn">
-                        <i class="fas fa-play"></i> Bắt Đầu Kiểm Tra B1
-                    </button>
-                </div>
-
-                <div id="testQuestion" class="test-container" style="display: none;">
-                    <div class="question-container">
-                        <div class="question-number" id="questionNumber">Câu 1/10</div>
-                        <button class="play-button" onclick="playCurrentQuestion()">
-                            <i class="fas fa-volume-up"></i> Phát Âm
-                        </button>
-                        <input type="text" class="answer-input" id="answerInput"
-                            placeholder="Nhập những gì bạn nghe được...">
-                        <div>
-                            <button class="btn" onclick="nextQuestion()">
-                                <i class="fas fa-arrow-right"></i> Câu Tiếp Theo (Enter)
-                            </button>
-                        </div>
-                        
-                    </div>
-                </div>
-
-                <div id="testResult" class="test-container" style="display: none;">
-                    <h3><i class="fas fa-trophy"></i> Kết Quả Kiểm Tra B1</h3>
-                    <div class="score" id="finalScore"></div>
-                    <div id="resultDetails"></div>
-                    <button class="btn" onclick="resetTest()">
-                        <i class="fas fa-redo"></i> Làm Lại
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
-            authDomain: "hz-listening.firebaseapp.com",
-            projectId: "hz-listening",
-            storageBucket: "hz-listening.firebasestorage.app",
-            messagingSenderId: "1044959632237",
-            appId: "1:1044959632237:web:d2fcc1294a83ca5349d864",
-            measurementId: "G-SEY2ERMPDW"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Global variables
-        let cards = [];
-        let currentTest = {
-            questions: [],
-            currentIndex: 0,
-            answers: [],
-            isActive: false
-        };
-
-        // Make functions globally available
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.cards = cards;
-        window.currentTest = currentTest;
-
-        // Load cards on page load
-        loadCards();
-
-        // Real-time listener for cards
-        const unsubscribe = onSnapshot(collection(db, "cards"), (snapshot) => {
-            cards.length = 0;
-            snapshot.forEach((doc) => {
-                cards.push({ id: doc.id, ...doc.data() });
-            });
-            displayCards();
-            updateStats();
-        });
-
-        async function loadCards() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "cards"));
-                cards.length = 0;
-                querySnapshot.forEach((doc) => {
-                    cards.push({ id: doc.id, ...doc.data() });
-                });
-                displayCards();
-                updateStats();
-            } catch (error) {
-                console.error("Error loading cards:", error);
-                document.getElementById('cardsList').innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Lỗi khi tải dữ liệu</div>';
-            }
-        }
-
-        window.loadCards = loadCards;
-    </script>
-
-    <script>
-        // Cấu hình 4 giọng nói chuẩn B1
-        const voiceConfigs = [
-            // Nữ trẻ (20-30 tuổi) - Giọng năng động, rõ ràng
-            {
-                type: 'young_female',
-                rate: 0.85,           // Tốc độ vừa phải cho B1
-                pitch: 1.2,           // Giọng cao, trẻ trung
-                volume: 1.0,
-                preferredNames: ['samantha', 'emma', 'ava', 'sarah', 'zoe', 'alice'],
-                description: '👩‍🦰 Nữ trẻ'
-            },
-            // Nữ trung niên (35-50 tuổi) - Giọng ổn định, rõ ràng
-            {
-                type: 'mature_female',
-                rate: 0.8,            // Chậm hơn một chút để dễ nghe
-                pitch: 1.0,           // Giọng trung tính
-                volume: 1.0,
-                preferredNames: ['susan', 'karen', 'moira', 'fiona', 'victoria', 'hazel'],
-                description: '👩‍💼 Nữ trung niên'
-            },
-            // Nam trẻ (20-30 tuổi) - Giọng tươi trẻ, rõ ràng
-            {
-                type: 'young_male',
-                rate: 0.9,            // Hơi nhanh nhưng vẫn rõ ràng
-                pitch: 0.9,           // Giọng cao hơn nam trung niên
-                volume: 1.0,
-                preferredNames: ['daniel', 'alex', 'ryan', 'james', 'nathan', 'oliver'],
-                description: '👨‍🦱 Nam trẻ'
-            },
-            // Nam trung niên (35-50 tuổi) - Giọng trầm ổn, dễ nghe
-            {
-                type: 'mature_male',
-                rate: 0.75,           // Chậm rãi, rõ ràng cho B1
-                pitch: 0.8,           // Giọng trầm, ổn định
-                volume: 1.0,
-                preferredNames: ['david', 'thomas', 'george', 'arthur', 'tom', 'fred'],
-                description: '👨‍💼 Nam trung niên'
-            }
-        ];
-
-        // Tab switching with animation
-        function showTab(tabName) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Update statistics
-        function updateStats() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const todayCards = window.cards.filter(card => {
-                const cardDate = card.createdAt?.toDate ? card.createdAt.toDate() : new Date(card.createdAt || 0);
-                cardDate.setHours(0, 0, 0, 0);
-                return cardDate.getTime() === today.getTime();
-            }).length;
-
-            document.getElementById('totalCards').textContent = window.cards.length;
-            document.getElementById('todayCards').textContent = todayCards;
-
-            const lastScore = localStorage.getItem('lastTestScore') || '0';
-            document.getElementById('lastScore').textContent = lastScore;
-        }
-
-        // Add new card with animation
-        async function addCard() {
-            const english = document.getElementById('englishInput').value.trim();
-            const vietnamese = document.getElementById('vietnameseInput').value.trim();
-
-            if (!english || !vietnamese) {
-                alert('Vui lòng nhập đầy đủ nội dung tiếng Anh và tiếng Việt!');
-                return;
-            }
-
-            try {
-                await window.addDoc(window.collection(window.db, "cards"), {
-                    english: english,
-                    vietnamese: vietnamese,
-                    createdAt: new Date()
-                });
-
-                // Clear inputs
-                document.getElementById('englishInput').value = '';
-                document.getElementById('vietnameseInput').value = '';
-
-                // Show success message
-                showNotification('Thẻ đã được thêm thành công!', 'success');
-
-                console.log('Card added successfully');
-            } catch (error) {
-                console.error("Error adding card:", error);
-                showNotification('Lỗi khi thêm thẻ: ' + error.message, 'error');
-            }
-        }
-
-        // Delete card with confirmation
-        async function deleteCard(cardId) {
-            if (confirm('Bạn có chắc chắn muốn xóa thẻ này?')) {
-                try {
-                    await window.deleteDoc(window.doc(window.db, "cards", cardId));
-                    showNotification('Thẻ đã được xóa thành công!', 'success');
-                    console.log('Card deleted successfully');
-                } catch (error) {
-                    console.error("Error deleting card:", error);
-                    showNotification('Lỗi khi xóa thẻ: ' + error.message, 'error');
-                }
-            }
-        }
-
-        // Display cards with improved UI
-        function displayCards() {
-            const cardsList = document.getElementById('cardsList');
-            const cardCount = document.getElementById('cardCount');
-
-            cardCount.textContent = `${window.cards.length} thẻ`;
-
-            if (window.cards.length === 0) {
-                cardsList.innerHTML = '<div class="loading"><i class="fas fa-inbox"></i> Chưa có thẻ nào. Hãy thêm thẻ đầu tiên!</div>';
-                return;
-            }
-
-            // Sort cards by creation time (newest first)
-            const sortedCards = [...window.cards].sort((a, b) => {
-                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
-                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
-                return dateB - dateA;
-            });
-
-            cardsList.innerHTML = sortedCards.map((card, index) => `
-                <div class="card ${index === 0 ? 'card-new' : ''}">
-                    <div class="card-content">
-                        <div class="card-english">${escapeHtml(card.english)}</div>
-                        <div class="card-vietnamese">${escapeHtml(card.vietnamese)}</div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn btn-play" onclick="speakText('${escapeForJs(card.english)}')">
-                            <i class="fas fa-volume-up"></i> B1 Voice
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteCard('${card.id}')">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Escape HTML for security
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Escape for JavaScript
-        function escapeForJs(text) {
-            return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        }
-
-        // Enhanced text to speech với 4 giọng B1 cố định
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel();
-
-                const speakWithVoices = () => {
-                    const voices = speechSynthesis.getVoices();
-
-                    if (voices.length === 0) {
-                        setTimeout(speakWithVoices, 100);
-                        return;
-                    }
-
-                    const englishVoices = voices.filter(voice =>
-                        voice.lang.startsWith('en-') && voice.name.length > 0
-                    );
-
-                    // Chọn một trong 4 giọng cố định cho B1
-                    const selectedConfig = voiceConfigs[Math.floor(Math.random() * 4)];
-                    
-                    // Tìm giọng phù hợp dựa trên tên ưa thích
-                    let selectedVoice = null;
-                    for (const preferredName of selectedConfig.preferredNames) {
-                        selectedVoice = englishVoices.find(voice => 
-                            voice.name.toLowerCase().includes(preferredName)
-                        );
-                        if (selectedVoice) break;
-                    }
-
-                    // Nếu không tìm thấy giọng ưa thích, chọn dựa trên giới tính
-                    if (!selectedVoice) {
-                        if (selectedConfig.type.includes('female')) {
-                            selectedVoice = englishVoices.find(voice => 
-                                voice.name.toLowerCase().includes('female') ||
-                                ['alice', 'allison', 'ava', 'emma', 'fiona', 'karen', 'moira', 'samantha', 'sarah', 'susan', 'tessa', 'veena', 'victoria', 'zoe', 'hazel'].some(name =>
-                                    voice.name.toLowerCase().includes(name)
-                                )
-                            );
-                        } else {
-                            selectedVoice = englishVoices.find(voice => 
-                                voice.name.toLowerCase().includes('male') ||
-                                ['alex', 'arthur', 'daniel', 'david', 'fred', 'george', 'james', 'john', 'lee', 'marcus', 'nathan', 'oliver', 'ralph', 'ryan', 'thomas', 'tom'].some(name =>
-                                    voice.name.toLowerCase().includes(name)
-                                )
-                            );
-                        }
-                    }
-
-                    // Fallback: chọn giọng tiếng Anh bất kỳ
-                    if (!selectedVoice && englishVoices.length > 0) {
-                        selectedVoice = englishVoices[0];
-                    }
-
-                    const utterance = new SpeechSynthesisUtterance(text);
-
-                    if (selectedVoice) {
-                        utterance.voice = selectedVoice;
-                        utterance.lang = selectedVoice.lang;
-                    }
-
-                    // Áp dụng cấu hình giọng nói B1 cố định
-                    utterance.rate = selectedConfig.rate;
-                    utterance.pitch = selectedConfig.pitch;
-                    utterance.volume = selectedConfig.volume;
-
-                    // Hiển thị thông tin giọng đang sử dụng (cho debugging)
-                    console.log(`B1 Voice: ${selectedConfig.description} - Rate: ${selectedConfig.rate} - ${selectedVoice ? selectedVoice.name : 'Default'}`);
-
-                    utterance.addEventListener('error', (e) => {
-                        console.error('Speech synthesis error:', e);
-                        showNotification('Please wait to load!', 'error');
-                    });
-
-                    speechSynthesis.speak(utterance);
-                };
-
-                speakWithVoices();
-            } else {
-                showNotification('Trình duyệt không hỗ trợ tính năng đọc văn bản!', 'error');
-            }
-        }
-
-        // Cập nhật hàm updateVoiceInfo để hiển thị 4 giọng B1
-        function updateVoiceInfo() {
-            const voices = speechSynthesis.getVoices();
-            const englishVoices = voices.filter(voice => voice.lang.startsWith('en-'));
-            const voiceCount = document.getElementById('voiceCount');
-
-            if (voiceCount && englishVoices.length > 0) {
-                voiceCount.innerHTML = `
-                    <strong>🎯 Hệ thống 4 giọng nói chuẩn B1:</strong><br>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
-                        <div>👩‍🦰 Nữ trẻ (tốc độ 0.85)</div>
-                        <div>👩‍💼 Nữ trung niên (tốc độ 0.8)</div>
-                        <div>👨‍🦱 Nam trẻ (tốc độ 0.9)</div>
-                        <div>👨‍💼 Nam trung niên (tốc độ 0.75)</div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.85em; font-style: italic;">
-                        ✅ Tốc độ được tối ưu cho trình độ B1
-                    </div>
-                `;
-            }
-        }
-
-        // Initialize voices on page load
-        function initializeVoices() {
-            if ('speechSynthesis' in window) {
-                const loadVoices = () => {
-                    const voices = speechSynthesis.getVoices();
-                    if (voices.length > 0) {
-                        console.log('Available voices loaded:', voices.length);
-                        const englishVoices = voices.filter(voice => voice.lang.startsWith('en-'));
-                        console.log('English voices available:', englishVoices.map(v => `${v.name} (${v.lang})`));
-                        
-                        updateVoiceInfo();
-                        
-                        if (englishVoices.length > 0) {
-                            showNotification(`✅ Đã tải hệ thống 4 giọng nói B1!`, 'success');
-                        }
-                    } else {
-                        setTimeout(loadVoices, 100);
-                    }
-                };
-
-                speechSynthesis.addEventListener('voiceschanged', loadVoices);
-                loadVoices();
-            }
-        }
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.innerHTML = `
-               <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-               ${message}
-           `;
-
-            notification.style.cssText = `
-               position: fixed;
-               top: 20px;
-               right: 20px;
-               padding: 15px 20px;
-               border-radius: 10px;
-               color: white;
-               font-weight: 600;
-               z-index: 1000;
-               animation: slideInRight 0.3s ease-out;
-               max-width: 320px;
-               box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-           `;
-
-            switch (type) {
-                case 'success':
-                    notification.style.background = 'linear-gradient(135deg, var(--success), #059669)';
-                    break;
-                case 'error':
-                    notification.style.background = 'linear-gradient(135deg, var(--error), #dc2626)';
-                    break;
-                default:
-                    notification.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
-            }
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease-in';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // Start test với thông báo về 4 giọng B1
-        function startTest() {
-            if (window.cards.length < 10) {
-                showNotification(`Bạn cần có ít nhất 10 thẻ để làm bài kiểm tra. Hiện tại bạn có ${window.cards.length} thẻ.`, 'error');
-                return;
-            }
-
-            // Shuffle and select 10 random cards
-            const shuffled = [...window.cards].sort(() => Math.random() - 0.5);
-            window.currentTest.questions = shuffled.slice(0, 10);
-            window.currentTest.currentIndex = 0;
-            window.currentTest.answers = [];
-            window.currentTest.isActive = true;
-            // Gán giọng nói cố định cho từng câu
-window.currentTest.voiceForQuestions = [];
-window.currentTest.questions.forEach(() => {
-    const selectedConfig = voiceConfigs[Math.floor(Math.random() * 4)];
-    window.currentTest.voiceForQuestions.push(selectedConfig);
-});
-
-
-            // Show test interface
-            document.getElementById('testStart').style.display = 'none';
-            document.getElementById('testQuestion').style.display = 'block';
-            document.getElementById('testResult').style.display = 'none';
-
-            showCurrentQuestion();
-            showNotification('🎯 Bắt đầu với 4 giọng nói B1! Chúc bạn may mắn!', 'success');
-        }
-
-        // Show current question with progress
-        function showCurrentQuestion() {
-            const questionNumber = document.getElementById('questionNumber');
-            const answerInput = document.getElementById('answerInput');
-
-            questionNumber.innerHTML = `
-               <i class="fas fa-question-circle"></i> 
-               Câu ${window.currentTest.currentIndex + 1}/10 - Giọng B1
-               <div style="width: 100%; background: var(--gray-200); border-radius: 10px; height: 8px; margin-top: 10px;">
-                   <div style="width: ${(window.currentTest.currentIndex + 1) * 10}%; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; height: 100%; transition: all 0.5s ease;"></div>
+   <div class="container">
+       <div class="header">
+           <h1><i class="fas fa-headphones"></i> Luyện Listening Pro</h1>
+           <p>Nâng cao kỹ năng nghe tiếng Anh cùng Hz Chong </p>
+       </div>
+
+       <div class="tab-container">
+           <button class="tab active" onclick="showTab('practice')">
+               <i class="fas fa-book-open"></i>Thẻ
+           </button>
+           <button class="tab" onclick="showTab('test')">
+               <i class="fas fa-clipboard-check"></i> Test 1
+           </button>
+           <button class="tab" onclick="showTab('meaning-test')">
+               <i class="fas fa-brain"></i> Test 2
+           </button>
+       </div>
+
+       <div class="content">
+           <!-- Practice Section -->
+           <div id="practice" class="section active">
+               <h2 class="section-title">
+                   <i class="fas fa-book-open"></i> Thẻ
+               </h2>
+
+               <div class="stats-card">
+                   <div class="stat-item">
+                       <span class="stat-number" id="totalCards">0</span>
+                       <span class="stat-label">Tổng số thẻ</span>
+                   </div>
+                   <div class="stat-item">
+                       <span class="stat-number" id="todayCards">0</span>
+                       <span class="stat-label">Thẻ hôm nay</span>
+                   </div>
+                   <div class="stat-item">
+                       <span class="stat-number" id="lastScore">0</span>
+                       <span class="stat-label">Điểm gần nhất</span>
+                   </div>
                </div>
-           `;
-            answerInput.value = '';
-            answerInput.focus();
 
-            // Auto-play the question after a short delay
-            setTimeout(() => {
-                playCurrentQuestion();
-            }, 500);
-        }
+               <div class="add-card-form">
+                   <h3><i class="fas fa-plus-circle"></i> Thêm thẻ mới</h3>
+                   <div class="form-group">
+                       <label><i class="fas fa-globe-americas"></i> Tiếng Anh:</label>
+                       <input type="text" id="englishInput" placeholder="Nhập câu tiếng Anh...">
+                   </div>
+                   <div class="form-group">
+                       <label><i class="fas fa-language"></i> Tiếng Việt:</label>
+                       <input type="text" id="vietnameseInput" placeholder="Nhập nghĩa tiếng Việt...">
+                   </div>
+                   <button class="btn" onclick="addCard()">
+                       <i class="fas fa-plus"></i> Thêm Thẻ
+                   </button>
+               </div>
 
-        // Play current question with B1 voice
-        function playCurrentQuestion() {
-    const currentQuestion = window.currentTest.questions[window.currentTest.currentIndex];
-    const assignedVoice = window.currentTest.voiceForQuestions[window.currentTest.currentIndex];
-    speakTextWithSpecificVoice(currentQuestion.english, assignedVoice);
-}
+               <div class="cards-container">
+                   <div class="cards-header">
+                       <h3>Danh sách thẻ</h3>
+                       <div class="card-count" id="cardCount">0 thẻ</div>
+                   </div>
+                   <div id="cardsList">
+                       <div class="loading">
+                           <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
+                       </div>
+                   </div>
+               </div>
+           </div>
 
-        // Next question with validation
-        function nextQuestion() {
-            const answerInput = document.getElementById('answerInput');
-            const userAnswer = answerInput.value.trim();
+           <!-- Test Section -->
+           <div id="test" class="section">
+               <h2 class="section-title">
+                   <i class="fas fa-clipboard-check"></i> Kiểm Tra Nghe
+               </h2>
 
-            if (!userAnswer) {
-                showNotification('Vui lòng nhập câu trả lời!', 'error');
-                answerInput.focus();
-                return;
-            }
+               <div id="testStart" class="test-container">
+                   <div class="test-info">
+                       <h3><i class="fas fa-target"></i> Bài kiểm tra nghe </h3>
+                       <p>Bạn sẽ nghe 10 câu tiếng Anh ngẫu nhiên với <strong>4 giọng nói</strong> 
+                       (2 nam, 2 nữ, tốc độ phù hợp) và nhập lại những gì bạn nghe được.</p>
+                       
+                       <p><strong>Đặc biệt:</strong> Hệ thống sử dụng 4 giọng nói được tối ưu riêng  
+                       với tốc độ và độ rõ nét phù hợp.</p>
+                       <div id="voiceInfo"
+                           style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.7); border-radius: 12px; font-size: 0.9rem; border: 1px solid rgba(99,102,241,0.2);">
+                           <i class="fas fa-microphone"></i> <span id="voiceCount">Đang tải hệ thống giọng nói ...</span>
+                       </div>
+                   </div>
+                   <button class="btn btn-success" onclick="startTest()" id="startTestBtn">
+                       <i class="fas fa-play"></i> Bắt Đầu Kiểm Tra 
+                   </button>
+               </div>
 
-            // Save answer
-            window.currentTest.answers.push({
-                question: window.currentTest.questions[window.currentTest.currentIndex],
-                userAnswer: userAnswer,
-                correctAnswer: window.currentTest.questions[window.currentTest.currentIndex].english
-            });
+               <div id="testQuestion" class="test-container" style="display: none;">
+                   <div class="question-container">
+                       <div class="question-number" id="questionNumber">Câu 1/10</div>
+                       <button class="play-button" onclick="playCurrentQuestion()">
+                           <i class="fas fa-volume-up"></i> Phát Âm
+                       </button>
+                       <input type="text" class="answer-input" id="answerInput"
+                           placeholder="Nhập những gì bạn nghe được...">
+                       <div>
+                           <button class="btn" onclick="nextQuestion()">
+                               <i class="fas fa-arrow-right"></i> Câu Tiếp Theo (Enter)
+                           </button>
+                       </div>
+                       
+                   </div>
+               </div>
 
-            window.currentTest.currentIndex++;
+               <div id="testResult" class="test-container" style="display: none;">
+                   <h3><i class="fas fa-trophy"></i> Kết Quả Kiểm Tra</h3>
+                   <div class="score" id="finalScore"></div>
+                   <div id="resultDetails"></div>
+                   <button class="btn" onclick="resetTest()">
+                       <i class="fas fa-redo"></i> Làm Lại
+                   </button>
+               </div>
+           </div>
 
-            if (window.currentTest.currentIndex < 10) {
-                showCurrentQuestion();
-            } else {
-                showResults();
-            }
-        }
+           <!-- Meaning Test Section -->
+           <div id="meaning-test" class="section">
+               <h2 class="section-title">
+                   <i class="fas fa-brain"></i> Kiểm Tra Hiểu Nghĩa
+               </h2>
 
-        // Enhanced similarity calculation for B1 level
-        function calculateSimilarity(str1, str2) {
-            const normalize = (str) => str.toLowerCase()
-                .replace(/[^\w\s]/g, '')
-                .replace(/\s+/g, ' ')
-                .trim();
+               <div id="meaningTestStart" class="test-container">
+                   <div class="test-info">
+                       <h3><i class="fas fa-brain"></i> Bài kiểm tra hiểu nghĩa</h3>
+                       <p>Bạn sẽ nghe 10 câu tiếng Anh và nhập <strong>nghĩa tiếng Việt</strong> mà bạn hiểu được.</p>
+                       
+                       <p><strong>Lưu ý:</strong> Không cần dịch từng từ, chỉ cần viết nghĩa mà bạn hiểu được bằng tiếng Việt.</p>
+                       
+                       <div id="meaningVoiceInfo"
+                           style="margin-top: 15px; padding: 15px; background: rgba(255,193,7,0.1); border-radius: 12px; font-size: 0.9rem; border: 1px solid rgba(255,193,7,0.3);">
+                           <i class="fas fa-lightbulb"></i> <span>Tập trung vào việc hiểu nghĩa chung của câu</span>
+                       </div>
+                   </div>
+                   <button class="btn btn-warning" onclick="startMeaningTest()" id="startMeaningTestBtn">
+                       <i class="fas fa-play"></i> Bắt Đầu Kiểm Tra Hiểu Nghĩa
+                   </button>
+               </div>
 
-            const s1 = normalize(str1);
-            const s2 = normalize(str2);
+               <div id="meaningTestQuestion" class="test-container" style="display: none;">
+                   <div class="question-container">
+                       <div class="question-number" id="meaningQuestionNumber">Câu 1/10</div>
+                       <button class="play-button" onclick="playCurrentMeaningQuestion()" style="background: linear-gradient(135deg, #ff9800, #f57c00);">
+                           <i class="fas fa-volume-up"></i> Phát Âm
+                       </button>
+                       <input type="text" class="answer-input" id="meaningAnswerInput"
+                           placeholder="Nhập nghĩa tiếng Việt mà bạn hiểu được...">
+                       <div>
+                           <button class="btn btn-warning" onclick="nextMeaningQuestion()">
+                               <i class="fas fa-arrow-right"></i> Câu Tiếp Theo (Enter)
+                           </button>
+                       </div>
+                   </div>
+               </div>
 
-            if (s1 === s2) return 100;
+               <div id="meaningTestResult" class="test-container" style="display: none;">
+                   <h3><i class="fas fa-award"></i> Kết Quả Kiểm Tra Hiểu Nghĩa</h3>
+                   <div class="score" id="meaningFinalScore"></div>
+                   <div id="meaningResultDetails"></div>
+                   <button class="btn btn-warning" onclick="resetMeaningTest()">
+                       <i class="fas fa-redo"></i> Làm Lại
+                   </button>
+               </div>
+           </div>
+       </div>
+   </div>
 
-            const words1 = s1.split(' ');
-            const words2 = s2.split(' ');
+   <!-- Firebase SDK -->
+   <script type="module">
+       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+       import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
 
-            // Calculate word-level similarity với độ khoan dung cho B1
-            let matchCount = 0;
-            const maxWords = Math.max(words1.length, words2.length);
+       const firebaseConfig = {
+           apiKey: "AIzaSyBrJh1921kNKJq6EF0U76pBD_VaGChgQqk",
+           authDomain: "hz-listening.firebaseapp.com",
+           projectId: "hz-listening",
+           storageBucket: "hz-listening.firebasestorage.app",
+           messagingSenderId: "1044959632237",
+           appId: "1:1044959632237:web:d2fcc1294a83ca5349d864",
+           measurementId: "G-SEY2ERMPDW"
+       };
 
-            words1.forEach(word1 => {
-                const bestMatch = words2.reduce((best, word2) => {
-                    const similarity = getLevenshteinSimilarity(word1, word2);
-                    return similarity > best ? similarity : best;
-                }, 0);
+       const app = initializeApp(firebaseConfig);
+       const db = getFirestore(app);
 
-                if (bestMatch > 0.65) { // 65% similarity threshold for B1 level
-                    matchCount += bestMatch;
-                } else if (words2.includes(word1)) {
-                    matchCount += 1;
-                }
-            });
+       // Global variables
+       let cards = [];
+       let currentTest = {
+           questions: [],
+           currentIndex: 0,
+           answers: [],
+           isActive: false
+       };
 
-            const charSimilarity = getLevenshteinSimilarity(s1, s2);
-            const wordSimilarity = (matchCount / maxWords) * 100;
-            const finalSimilarity = Math.max(wordSimilarity, charSimilarity * 100);
+       let currentMeaningTest = {
+           questions: [],
+           currentIndex: 0,
+           answers: [],
+           isActive: false,
+           voiceForQuestions: []
+       };
 
-            return Math.round(Math.min(finalSimilarity, 100));
-        }
+       // Make functions globally available
+       window.db = db;
+       window.collection = collection;
+       window.addDoc = addDoc;
+       window.getDocs = getDocs;
+       window.deleteDoc = deleteDoc;
+       window.doc = doc;
+       window.cards = cards;
+       window.currentTest = currentTest;
+       window.currentMeaningTest = currentMeaningTest;
 
-        // Levenshtein distance for character similarity
-        function getLevenshteinSimilarity(str1, str2) {
-            const matrix = [];
-            const len1 = str1.length;
-            const len2 = str2.length;
+       // Load cards on page load
+       loadCards();
 
-            for (let i = 0; i <= len2; i++) {
-                matrix[i] = [i];
-            }
+       // Real-time listener for cards
+       const unsubscribe = onSnapshot(collection(db, "cards"), (snapshot) => {
+           cards.length = 0;
+           snapshot.forEach((doc) => {
+               cards.push({ id: doc.id, ...doc.data() });
+           });
+           displayCards();
+           updateStats();
+       });
 
-            for (let j = 0; j <= len1; j++) {
-                matrix[0][j] = j;
-            }
+       async function loadCards() {
+           try {
+               const querySnapshot = await getDocs(collection(db, "cards"));
+               cards.length = 0;
+               querySnapshot.forEach((doc) => {
+                   cards.push({ id: doc.id, ...doc.data() });
+               });
+               displayCards();
+               updateStats();
+           } catch (error) {
+               console.error("Error loading cards:", error);
+               document.getElementById('cardsList').innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Lỗi khi tải dữ liệu</div>';
+           }
+       }
 
-            for (let i = 1; i <= len2; i++) {
-                for (let j = 1; j <= len1; j++) {
-                    if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+       window.loadCards = loadCards;
+   </script>
+
+   <script>
+       // Cấu hình 4 giọng nói chuẩn B1
+       const voiceConfigs = [
+           // Nữ trẻ (20-30 tuổi) - Giọng năng động, rõ ràng
+           {
+               type: 'young_female',
+               rate: 0.85,           // Tốc độ vừa phải cho B1
+               pitch: 1.2,           // Giọng cao, trẻ trung
+               volume: 1.0,
+               preferredNames: ['samantha', 'emma', 'ava', 'sarah', 'zoe', 'alice'],
+               description: '👩‍🦰 Nữ trẻ'
+           },
+           // Nữ trung niên (35-50 tuổi) - Giọng ổn định, rõ ràng
+           {
+               type: 'mature_female',
+               rate: 0.8,            // Chậm hơn một chút để dễ nghe
+               pitch: 1.0,           // Giọng trung tính
+               volume: 1.0,
+               preferredNames: ['susan', 'karen', 'moira', 'fiona', 'victoria', 'hazel'],
+               description: '👩‍💼 Nữ trung niên'
+           },
+           // Nam trẻ (20-30 tuổi) - Giọng tươi trẻ, rõ ràng
+           {
+               type: 'young_male',
+               rate: 0.9,            // Hơi nhanh nhưng vẫn rõ ràng
+               pitch: 0.9,           // Giọng cao hơn nam trung niên
+               volume: 1.0,
+               preferredNames: ['daniel', 'alex', 'ryan', 'james', 'nathan', 'oliver'],
+               description: '👨‍🦱 Nam trẻ'
+           },
+           // Nam trung niên (35-50 tuổi) - Giọng trầm ổn, dễ nghe
+           {
+               type: 'mature_male',
+               rate: 0.75,           // Chậm rãi, rõ ràng cho B1
+               pitch: 0.8,           // Giọng trầm, ổn định
+               volume: 1.0,
+               preferredNames: ['david', 'thomas', 'george', 'arthur', 'tom', 'fred'],
+               description: '👨‍💼 Nam trung niên'
+           }
+       ];
+
+       // Tab switching with animation
+       function showTab(tabName) {
+           document.querySelectorAll('.section').forEach(section => {
+               section.classList.remove('active');
+           });
+
+           document.querySelectorAll('.tab').forEach(tab => {
+               tab.classList.remove('active');
+           });
+
+           document.getElementById(tabName).classList.add('active');
+           event.target.classList.add('active');
+       }
+
+       // Update statistics
+       function updateStats() {
+           const today = new Date();
+           today.setHours(0, 0, 0, 0);
+
+           const todayCards = window.cards.filter(card => {
+               const cardDate = card.createdAt?.toDate ? card.createdAt.toDate() : new Date(card.createdAt || 0);
+               cardDate.setHours(0, 0, 0, 0);
+               return cardDate.getTime() === today.getTime();
+           }).length;
+
+           document.getElementById('totalCards').textContent = window.cards.length;
+           document.getElementById('todayCards').textContent = todayCards;
+
+           const lastScore = localStorage.getItem('lastTestScore') || '0';
+           document.getElementById('lastScore').textContent = lastScore;
+       }
+
+       // Add new card with animation
+       async function addCard() {
+           const english = document.getElementById('englishInput').value.trim();
+           const vietnamese = document.getElementById('vietnameseInput').value.trim();
+
+           if (!english || !vietnamese) {
+               alert('Vui lòng nhập đầy đủ nội dung tiếng Anh và tiếng Việt!');
+               return;
+           }
+
+           try {
+               await window.addDoc(window.collection(window.db, "cards"), {
+                   english: english,
+                   vietnamese: vietnamese,
+                   createdAt: new Date()
+               });
+
+               // Clear inputs
+               document.getElementById('englishInput').value = '';
+               document.getElementById('vietnameseInput').value = '';
+
+               // Show success message
+               showNotification('Thẻ đã được thêm thành công!', 'success');
+
+               console.log('Card added successfully');
+           } catch (error) {
+               console.error("Error adding card:", error);
+               showNotification('Lỗi khi thêm thẻ: ' + error.message, 'error');
+           }
+       }
+
+       // Delete card with confirmation
+       async function deleteCard(cardId) {
+           if (confirm('Bạn có chắc chắn muốn xóa thẻ này?')) {
+               try {
+                   await window.deleteDoc(window.doc(window.db, "cards", cardId));
+                   showNotification('Thẻ đã được xóa thành công!', 'success');
+                   console.log('Card deleted successfully');
+               } catch (error) {
+                   console.error("Error deleting card:", error);
+                   showNotification('Lỗi khi xóa thẻ: ' + error.message, 'error');
+               }
+           }
+       }
+
+       // Display cards with improved UI
+       function displayCards() {
+           const cardsList = document.getElementById('cardsList');
+           const cardCount = document.getElementById('cardCount');
+
+           cardCount.textContent = `${window.cards.length} thẻ`;
+
+           if (window.cards.length === 0) {
+               cardsList.innerHTML = '<div class="loading"><i class="fas fa-inbox"></i> Chưa có thẻ nào. Hãy thêm thẻ đầu tiên!</div>';
+               return;
+           }
+
+           // Sort cards by creation time (newest first)
+           const sortedCards = [...window.cards].sort((a, b) => {
+               const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+               const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+               return dateB - dateA;
+           });
+
+           cardsList.innerHTML = sortedCards.map((card, index) => `
+               <div class="card ${index === 0 ? 'card-new' : ''}">
+                   <div class="card-content">
+                       <div class="card-english">${escapeHtml(card.english)}</div>
+                       <div class="card-vietnamese">${escapeHtml(card.vietnamese)}</div>
+                   </div>
+                   <div class="card-actions">
+                       <button class="btn btn-play" onclick="speakText('${escapeForJs(card.english)}')">
+                           <i class="fas fa-volume-up"></i> Voice
+                       </button>
+                       <button class="btn btn-danger" onclick="deleteCard('${card.id}')">
+                           <i class="fas fa-trash"></i> Xóa
+                       </button>
+                   </div>
+               </div>
+           `).join('');
+       }
+
+       // Escape HTML for security
+       function escapeHtml(text) {
+           const div = document.createElement('div');
+           div.textContent = text;
+           return div.innerHTML;
+       }
+
+       // Escape for JavaScript
+       function escapeForJs(text) {
+           return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+       }
+
+       // Enhanced text to speech với 4 giọng B1 cố định
+       function speakText(text) {
+           if ('speechSynthesis' in window) {
+               speechSynthesis.cancel();
+
+               const speakWithVoices = () => {
+                   const voices = speechSynthesis.getVoices();
+
+                   if (voices.length === 0) {
+                       setTimeout(speakWithVoices, 100);
+                       return;
+                   }
+
+                   const englishVoices = voices.filter(voice =>
+                       voice.lang.startsWith('en-') && voice.name.length > 0
+                   );
+
+                   // Chọn một trong 4 giọng cố định cho B1
+                   const selectedConfig = voiceConfigs[Math.floor(Math.random() * 4)];
+                   
+                   // Tìm giọng phù hợp dựa trên tên ưa thích
+                   let selectedVoice = null;
+                   for (const preferredName of selectedConfig.preferredNames) {
+                       selectedVoice = englishVoices.find(voice => 
+                           voice.name.toLowerCase().includes(preferredName)
+                       );
+                       if (selectedVoice) break;
+                   }
+
+                   // Nếu không tìm thấy giọng ưa thích, chọn dựa trên giới tính
+                   if (!selectedVoice) {
+                       if (selectedConfig.type.includes('female')) {
+                           selectedVoice = englishVoices.find(voice => 
+                               voice.name.toLowerCase().includes('female') ||
+                               ['alice', 'allison', 'ava', 'emma', 'fiona', 'karen', 'moira', 'samantha', 'sarah', 'susan', 'tessa', 'veena', 'victoria', 'zoe', 'hazel'].some(name =>
+                                   voice.name.toLowerCase().includes(name)
+                               )
+                           );
+                       } else {
+                           selectedVoice = englishVoices.find(voice => 
+                               voice.name.toLowerCase().includes('male') ||
+                               ['alex', 'arthur', 'daniel', 'david', 'fred', 'george', 'james', 'john', 'lee', 'marcus', 'nathan', 'oliver', 'ralph', 'ryan', 'thomas', 'tom'].some(name =>
+                                   voice.name.toLowerCase().includes(name)
+                               )
+                           );
+                       }
+                   }
+
+                   // Fallback: chọn giọng tiếng Anh bất kỳ
+                   if (!selectedVoice && englishVoices.length > 0) {
+                       selectedVoice = englishVoices[0];
+                   }
+
+                   const utterance = new SpeechSynthesisUtterance(text);
+
+                   if (selectedVoice) {
+                       utterance.voice = selectedVoice;
+                       utterance.lang = selectedVoice.lang;
+                   }
+
+                   // Áp dụng cấu hình giọng nói B1 cố định
+                   utterance.rate = selectedConfig.rate;
+                   utterance.pitch = selectedConfig.pitch;
+                   utterance.volume = selectedConfig.volume;
+
+                   // Hiển thị thông tin giọng đang sử dụng (cho debugging)
+                   console.log(`Voice: ${selectedConfig.description} - Rate: ${selectedConfig.rate} - ${selectedVoice ? selectedVoice.name : 'Default'}`);
+
+                   utterance.addEventListener('error', (e) => {
+                       console.error('Speech synthesis error:', e);
+                       showNotification('Please wait to load!', 'error');
+                   });
+
+                   speechSynthesis.speak(utterance);
+               };
+
+               speakWithVoices();
+           } else {
+               showNotification('Trình duyệt không hỗ trợ tính năng đọc văn bản!', 'error');
+           }
+       }
+
+       // Cập nhật hàm updateVoiceInfo để hiển thị 4 giọng B1
+       function updateVoiceInfo() {
+           const voices = speechSynthesis.getVoices();
+           const englishVoices = voices.filter(voice => voice.lang.startsWith('en-'));
+           const voiceCount = document.getElementById('voiceCount');
+
+           if (voiceCount && englishVoices.length > 0) {
+               voiceCount.innerHTML = `
+                   <strong>🎯 Hệ thống 4 giọng nói:</strong><br>
+                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+                       <div>👩‍🦰 Nữ trẻ (tốc độ 0.85)</div>
+                       <div>👩‍💼 Nữ trung niên (tốc độ 0.8)</div>
+                       <div>👨‍🦱 Nam trẻ (tốc độ 0.9)</div>
+                       <div>👨‍💼 Nam trung niên (tốc độ 0.75)</div>
+                   </div>
+                   <div style="margin-top: 8px; font-size: 0.85em; font-style: italic;">
+                       ✅ Tốc độ được tối ưu 
+                   </div>
+               `;
+           }
+       }
+
+       // Initialize voices on page load
+       function initializeVoices() {
+           if ('speechSynthesis' in window) {
+               const loadVoices = () => {
+                   const voices = speechSynthesis.getVoices();
+                   if (voices.length > 0) {
+                       console.log('Available voices loaded:', voices.length);
+                       const englishVoices = voices.filter(voice => voice.lang.startsWith('en-'));
+                       console.log('English voices available:', englishVoices.map(v => `${v.name} (${v.lang})`));
+                       
+                       updateVoiceInfo();
+                       
+                       if (englishVoices.length > 0) {
+                           showNotification(`✅ Đã tải hệ thống 4 giọng nói!`, 'success');
+                       }
+                   } else {
+                       setTimeout(loadVoices, 100);
+                   }
+               };
+
+               speechSynthesis.addEventListener('voiceschanged', loadVoices);
+               loadVoices();
+           }
+       }
+
+       // Show notification
+       function showNotification(message, type = 'info') {
+           const notification = document.createElement('div');
+           notification.className = `notification notification-${type}`;
+           notification.innerHTML = `
+              <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+              ${message}
+          `;
+
+           notification.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              padding: 15px 20px;
+              border-radius: 10px;
+              color: white;
+              font-weight: 600;
+              z-index: 1000;
+              animation: slideInRight 0.3s ease-out;
+              max-width: 320px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+          `;
+
+           switch (type) {
+               case 'success':
+                   notification.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+                   break;
+               case 'error':
+                   notification.style.background = 'linear-gradient(135deg, var(--error), #dc2626)';
+                   break;
+               default:
+                   notification.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+           }
+
+           document.body.appendChild(notification);
+
+           setTimeout(() => {
+               notification.style.animation = 'slideOutRight 0.3s ease-in';
+               setTimeout(() => {
+                   if (document.body.contains(notification)) {
+                       document.body.removeChild(notification);
+                   }
+               }, 300);
+           }, 3000);
+       }
+
+       // Start test với thông báo về 4 giọng B1
+       function startTest() {
+           if (window.cards.length < 10) {
+               showNotification(`Bạn cần có ít nhất 10 thẻ để làm bài kiểm tra. Hiện tại bạn có ${window.cards.length} thẻ.`, 'error');
+               return;
+           }
+
+           // Shuffle and select 10 random cards
+           const shuffled = [...window.cards].sort(() => Math.random() - 0.5);
+           window.currentTest.questions = shuffled.slice(0, 10);
+           window.currentTest.currentIndex = 0;
+           window.currentTest.answers = [];
+           window.currentTest.isActive = true;
+           // Gán giọng nói cố định cho từng câu
+           window.currentTest.voiceForQuestions = [];
+           window.currentTest.questions.forEach(() => {
+               const selectedConfig = voiceConfigs[Math.floor(Math.random() * 4)];
+               window.currentTest.voiceForQuestions.push(selectedConfig);
+           });
+
+           // Show test interface
+           document.getElementById('testStart').style.display = 'none';
+           document.getElementById('testQuestion').style.display = 'block';
+           document.getElementById('testResult').style.display = 'none';
+
+           showCurrentQuestion();
+           showNotification('🎯 Bắt đầu với 4 giọng nói! Chúc bạn may mắn!', 'success');
+       }
+
+       // Show current question with progress
+       function showCurrentQuestion() {
+           const questionNumber = document.getElementById('questionNumber');
+           const answerInput = document.getElementById('answerInput');
+
+           questionNumber.innerHTML = `
+              <i class="fas fa-question-circle"></i> 
+              Câu ${window.currentTest.currentIndex + 1}/10 
+              <div style="width: 100%; background: var(--gray-200); border-radius: 10px; height: 8px; margin-top: 10px;">
+                  <div style="width: ${(window.currentTest.currentIndex + 1) * 10}%; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; height: 100%; transition: all 0.5s ease;"></div>
+              </div>
+          `;
+           answerInput.value = '';
+           answerInput.focus();
+
+           // Auto-play the question after a short delay
+           setTimeout(() => {
+               playCurrentQuestion();
+           }, 500);
+       }
+
+       // Play current question with voice
+       function playCurrentQuestion() {
+           const currentQuestion = window.currentTest.questions[window.currentTest.currentIndex];
+           const assignedVoice = window.currentTest.voiceForQuestions[window.currentTest.currentIndex];
+           speakTextWithSpecificVoice(currentQuestion.english, assignedVoice);
+       }
+
+       // Next question with validation
+       function nextQuestion() {
+           const answerInput = document.getElementById('answerInput');
+           const userAnswer = answerInput.value.trim();
+
+           if (!userAnswer) {
+               showNotification('Vui lòng nhập câu trả lời!', 'error');
+               answerInput.focus();
+               return;
+           }
+
+           // Save answer
+           window.currentTest.answers.push({
+               question: window.currentTest.questions[window.currentTest.currentIndex],
+               userAnswer: userAnswer,
+               correctAnswer: window.currentTest.questions[window.currentTest.currentIndex].english
+           });
+
+           window.currentTest.currentIndex++;
+
+           if (window.currentTest.currentIndex < 10) {
+               showCurrentQuestion();
+           } else {
+               showResults();
+           }
+       }
+
+       // Enhanced similarity calculation for B1 level
+       function calculateSimilarity(str1, str2) {
+           const normalize = (str) => str.toLowerCase()
+               .replace(/[^\w\s]/g, '')
+               .replace(/\s+/g, ' ')
+               .trim();
+
+           const s1 = normalize(str1);
+           const s2 = normalize(str2);
+
+           if (s1 === s2) return 100;
+
+           const words1 = s1.split(' ');
+           const words2 = s2.split(' ');
+
+           // Calculate word-level similarity với độ khoan dung cho B1
+           let matchCount = 0;
+           const maxWords = Math.max(words1.length, words2.length);
+
+           words1.forEach(word1 => {
+               const bestMatch = words2.reduce((best, word2) => {
+                   const similarity = getLevenshteinSimilarity(word1, word2);
+                   return similarity > best ? similarity : best;
+               }, 0);
+
+               if (bestMatch > 0.65) { // 65% similarity threshold for B1 level
+                   matchCount += bestMatch;
+               } else if (words2.includes(word1)) {
+                   matchCount += 1;
+               }
+           });
+
+           const charSimilarity = getLevenshteinSimilarity(s1, s2);
+           const wordSimilarity = (matchCount / maxWords) * 100;
+           const finalSimilarity = Math.max(wordSimilarity, charSimilarity * 100);
+
+           return Math.round(Math.min(finalSimilarity, 100));
+       }
+
+       // Levenshtein distance for character similarity
+       function getLevenshteinSimilarity(str1, str2) {
+           const matrix = [];
+           const len1 = str1.length;
+           const len2 = str2.length;
+
+           for (let i = 0; i <= len2; i++) {
+               matrix[i] = [i];
+           }
+
+           for (let j = 0; j <= len1; j++) {
+               matrix[0][j] = j;
+           }
+
+           for (let i = 1; i <= len2; i++) {
+               for (let j = 1; j <= len1; j++) {
+                   if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
                        matrix[i][j] = matrix[i - 1][j - 1];
                    } else {
                        matrix[i][j] = Math.min(
@@ -1244,74 +1308,74 @@ window.currentTest.questions.forEach(() => {
            // Determine performance level cho B1
            let performanceLevel, performanceIcon, performanceColor, advice;
            if (averageScore >= 85) {
-               performanceLevel = 'Xuất sắc B1+';
+               performanceLevel = 'Xuất sắc!';
                performanceIcon = 'fas fa-crown';
                performanceColor = '#f59e0b';
-               advice = 'Bạn đã sẵn sàng cho B2! 🎉';
+               advice = 'Bạn đã sẵn sàng cho thử thách tiếp theo! 🎉';
            } else if (averageScore >= 75) {
-               performanceLevel = 'Tốt - B1 vững';
+               performanceLevel = 'Tốt - nền tảng vững';
                performanceIcon = 'fas fa-star';
                performanceColor = '#10b981';
-               advice = 'Trình độ B1 rất tốt, tiếp tục phát huy! 👍';
+               advice = 'Trình độ tốt, tiếp tục phát huy! 👍';
            } else if (averageScore >= 65) {
-               performanceLevel = 'Đạt B1';
+               performanceLevel = 'Đạt';
                performanceIcon = 'fas fa-thumbs-up';
                performanceColor = '#06b6d4';
-               advice = 'Đã đạt B1, cần luyện thêm để vững hơn. 💪';
+               advice = 'Đã đạt, cần luyện thêm để vững hơn. 💪';
            } else if (averageScore >= 55) {
-               performanceLevel = 'Gần B1';
+               performanceLevel = 'Có cố gắng';
                performanceIcon = 'fas fa-hand-paper';
                performanceColor = '#f59e0b';
-               advice = 'Sắp đạt B1, cần luyện thêm listening! 📚';
+               advice = 'Cần cố gắng hơn, cần luyện thêm listening! 📚';
            } else {
-               performanceLevel = 'Chưa đạt B1';
+               performanceLevel = 'Chưa đạt';
                performanceIcon = 'fas fa-fist-raised';
                performanceColor = '#ef4444';
-               advice = 'Cần luyện tập thêm để đạt B1. Đừng bỏ cuộc! 🔥';
+               advice = 'Cần luyện tập thêm. Đừng bỏ cuộc! 🔥';
            }
 
            document.getElementById('finalScore').innerHTML = `
-              <div style="color: ${performanceColor}; margin-bottom: 15px;">
-                  <i class="${performanceIcon}"></i> ${performanceLevel}
-              </div>
-              <div>Điểm số: ${averageScore}/100</div>
-              <div style="font-size: 1.2rem; margin-top: 10px;">
-                  ✅ Số câu đúng: ${correctCount}/10 (≥65%)
-              </div>
-              <div style="font-size: 1rem; margin-top: 15px; color: var(--gray-600); font-style: italic;">
-                  ${advice}
-              </div>
-          `;
+             <div style="color: ${performanceColor}; margin-bottom: 15px;">
+                 <i class="${performanceIcon}"></i> ${performanceLevel}
+             </div>
+             <div>Điểm số: ${averageScore}/100</div>
+             <div style="font-size: 1.2rem; margin-top: 10px;">
+                 ✅ Số câu đúng: ${correctCount}/10 (≥65%)
+             </div>
+             <div style="font-size: 1rem; margin-top: 15px; color: var(--gray-600); font-style: italic;">
+                 ${advice}
+             </div>
+         `;
 
            const resultDetails = document.getElementById('resultDetails');
-resultDetails.innerHTML = results.map((result, index) => `
-   <div class="result-item ${result.isCorrect ? 'correct' : 'incorrect'}">
-       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-           <strong>Câu ${index + 1}</strong>
-           <div style="display: flex; gap: 10px; align-items: center;">
-               <button class="btn btn-play" style="padding: 6px 12px; font-size: 0.8rem;" onclick="replayResultQuestion(${index})">
-                   <i class="fas fa-volume-up"></i> Nghe lại
-               </button>
-               <div style="background: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">
-                   ${result.score}%
+           resultDetails.innerHTML = results.map((result, index) => `
+               <div class="result-item ${result.isCorrect ? 'correct' : 'incorrect'}">
+                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                       <strong>Câu ${index + 1}</strong>
+                       <div style="display: flex; gap: 10px; align-items: center;">
+                           <button class="btn btn-play" style="padding: 6px 12px; font-size: 0.8rem;" onclick="replayResultQuestion(${index})">
+                               <i class="fas fa-volume-up"></i> Nghe lại
+                           </button>
+                           <div style="background: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">
+                               ${result.score}%
+                           </div>
+                           <div style="font-size: 0.8rem; color: var(--gray-500);">
+                               ${result.score >= 85 ? '🌟 Hoàn hảo' : result.score >= 75 ? '✅ Tốt' : result.score >= 65 ? '👍 Đạt' : result.score >= 50 ? '⚠️ Gần' : '❌ Sai'}
+                           </div>
+                       </div>
+                   </div>
+                   <div style="margin-bottom: 8px;"><strong>Đáp án:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(result.correctAnswer)}</span></div>
+                   <div style="margin-bottom: 8px;"><strong>Bạn nhập:</strong> <span style="color: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; font-weight: 500;">${escapeHtml(result.userAnswer)}</span></div>
+                   <div><strong>Nghĩa:</strong> <em style="color: var(--gray-600);">${escapeHtml(result.question.vietnamese)}</em></div>
                </div>
-               <div style="font-size: 0.8rem; color: var(--gray-500);">
-                   ${result.score >= 85 ? '🌟 Hoàn hảo' : result.score >= 75 ? '✅ Tốt' : result.score >= 65 ? '👍 Đạt' : result.score >= 50 ? '⚠️ Gần' : '❌ Sai'}
-               </div>
-           </div>
-       </div>
-       <div style="margin-bottom: 8px;"><strong>Đáp án:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(result.correctAnswer)}</span></div>
-       <div style="margin-bottom: 8px;"><strong>Bạn nhập:</strong> <span style="color: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; font-weight: 500;">${escapeHtml(result.userAnswer)}</span></div>
-       <div><strong>Nghĩa:</strong> <em style="color: var(--gray-600);">${escapeHtml(result.question.vietnamese)}</em></div>
-   </div>
-`).join('');
+           `).join('');
 
            // Update stats
            updateStats();
 
            // Show completion notification with B1 context
            const notificationMessage = averageScore >= 65 ? 
-               `🎯 Hoàn thành bài B1! Điểm: ${averageScore}/100 - ${performanceLevel}` :
+               `🎯 Hoàn thành bài test! Điểm: ${averageScore}/100 - ${performanceLevel}` :
                `📊 Hoàn thành bài test! Điểm: ${averageScore}/100 - Tiếp tục luyện để đạt B1!`;
            
            showNotification(notificationMessage, averageScore >= 65 ? 'success' : 'info');
@@ -1327,6 +1391,306 @@ resultDetails.innerHTML = results.map((result, index) => `
            document.getElementById('testStart').style.display = 'block';
            document.getElementById('testQuestion').style.display = 'none';
            document.getElementById('testResult').style.display = 'none';
+       }
+
+       // Start meaning test
+       function startMeaningTest() {
+           if (window.cards.length < 10) {
+               showNotification(`Bạn cần có ít nhất 10 thẻ để làm bài kiểm tra. Hiện tại bạn có ${window.cards.length} thẻ.`, 'error');
+               return;
+           }
+
+           // Shuffle and select 10 random cards
+           const shuffled = [...window.cards].sort(() => Math.random() - 0.5);
+           window.currentMeaningTest.questions = shuffled.slice(0, 10);
+           window.currentMeaningTest.currentIndex = 0;
+           window.currentMeaningTest.answers = [];
+           window.currentMeaningTest.isActive = true;
+           
+           // Assign voice for each question
+           window.currentMeaningTest.voiceForQuestions = [];
+           window.currentMeaningTest.questions.forEach(() => {
+               const selectedConfig = voiceConfigs[Math.floor(Math.random() * 4)];
+               window.currentMeaningTest.voiceForQuestions.push(selectedConfig);
+           });
+
+           // Show test interface
+           document.getElementById('meaningTestStart').style.display = 'none';
+           document.getElementById('meaningTestQuestion').style.display = 'block';
+           document.getElementById('meaningTestResult').style.display = 'none';
+
+           showCurrentMeaningQuestion();
+           showNotification('🧠 Bắt đầu kiểm tra hiểu nghĩa! Tập trung vào nghĩa chung của câu!', 'success');
+       }
+
+       // Show current meaning question
+       function showCurrentMeaningQuestion() {
+           const questionNumber = document.getElementById('meaningQuestionNumber');
+           const answerInput = document.getElementById('meaningAnswerInput');
+
+           questionNumber.innerHTML = `
+               <i class="fas fa-brain"></i> 
+               Câu ${window.currentMeaningTest.currentIndex + 1}/10 
+               <div style="width: 100%; background: var(--gray-200); border-radius: 10px; height: 8px; margin-top: 10px;">
+                   <div style="width: ${(window.currentMeaningTest.currentIndex + 1) * 10}%; background: linear-gradient(135deg, #ff9800, #f57c00); border-radius: 10px; height: 100%; transition: all 0.5s ease;"></div>
+               </div>
+           `;
+           answerInput.value = '';
+           answerInput.focus();
+
+           // Auto-play the question after a short delay
+           setTimeout(() => {
+               playCurrentMeaningQuestion();
+           }, 500);
+       }
+
+       // Play current meaning question
+       function playCurrentMeaningQuestion() {
+           const currentQuestion = window.currentMeaningTest.questions[window.currentMeaningTest.currentIndex];
+           const assignedVoice = window.currentMeaningTest.voiceForQuestions[window.currentMeaningTest.currentIndex];
+           speakTextWithSpecificVoice(currentQuestion.english, assignedVoice);
+       }
+
+       // Next meaning question
+       function nextMeaningQuestion() {
+           const answerInput = document.getElementById('meaningAnswerInput');
+           const userAnswer = answerInput.value.trim();
+
+           if (!userAnswer) {
+               showNotification('Vui lòng nhập nghĩa tiếng Việt!', 'error');
+               answerInput.focus();
+               return;
+           }
+
+           // Save answer
+           window.currentMeaningTest.answers.push({
+               question: window.currentMeaningTest.questions[window.currentMeaningTest.currentIndex],
+               userAnswer: userAnswer,
+               correctAnswer: window.currentMeaningTest.questions[window.currentMeaningTest.currentIndex].vietnamese
+           });
+
+           window.currentMeaningTest.currentIndex++;
+
+           if (window.currentMeaningTest.currentIndex < 10) {
+               showCurrentMeaningQuestion();
+           } else {
+               showMeaningResults();
+           }
+       }
+
+       // Calculate meaning similarity (more flexible for Vietnamese)
+       function calculateMeaningSimilarity(userAnswer, correctAnswer) {
+           const normalize = (str) => str.toLowerCase()
+               .replace(/[^\w\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/g, '')
+               .replace(/\s+/g, ' ')
+               .trim();
+
+           const user = normalize(userAnswer);
+           const correct = normalize(correctAnswer);
+
+           if (user === correct) return 100;
+
+           // Check for key word matches
+           const userWords = user.split(' ').filter(w => w.length > 2);
+           const correctWords = correct.split(' ').filter(w => w.length > 2);
+           
+           let keyWordMatches = 0;
+           userWords.forEach(userWord => {
+               if (correctWords.some(correctWord => 
+                   correctWord.includes(userWord) || userWord.includes(correctWord) ||
+                   getLevenshteinSimilarity(userWord, correctWord) > 0.7
+               )) {
+                   keyWordMatches++;
+               }
+           });
+
+           const keyWordScore = Math.min((keyWordMatches / Math.max(correctWords.length, 1)) * 100, 100);
+           const charSimilarity = getLevenshteinSimilarity(user, correct) * 100;
+           
+           return Math.round(Math.max(keyWordScore, charSimilarity));
+       }
+
+       // Show meaning test results
+       function showMeaningResults() {
+           document.getElementById('meaningTestQuestion').style.display = 'none';
+           document.getElementById('meaningTestResult').style.display = 'block';
+
+           let totalScore = 0;
+           const results = window.currentMeaningTest.answers.map(answer => {
+               const similarity = calculateMeaningSimilarity(answer.userAnswer, answer.correctAnswer);
+               totalScore += similarity;
+
+               return {
+                   ...answer,
+                   score: similarity,
+                   isCorrect: similarity >= 60  // Lower threshold for meaning understanding
+               };
+           });
+
+           const averageScore = Math.round(totalScore / 10);
+           const correctCount = results.filter(r => r.isCorrect).length;
+
+           // Save score to localStorage
+           localStorage.setItem('lastMeaningTestScore', averageScore);
+
+           // Determine performance level
+           let performanceLevel, performanceIcon, performanceColor, advice;
+           if (averageScore >= 85) {
+               performanceLevel = 'Xuất sắc!';
+               performanceIcon = 'fas fa-crown';
+               performanceColor = '#f59e0b';
+               advice = 'Khả năng hiểu nghĩa tuyệt vời! 🎉';
+           } else if (averageScore >= 75) {
+               performanceLevel = 'Tốt - hiểu nghĩa rất tốt';
+               performanceIcon = 'fas fa-star';
+               performanceColor = '#10b981';
+               advice = 'Khả năng hiểu nghĩa tốt! 👍';
+           } else if (averageScore >= 60) {
+               performanceLevel = 'Đạt - hiểu được cơ bản';
+               performanceIcon = 'fas fa-thumbs-up';
+               performanceColor = '#06b6d4';
+               advice = 'Cần luyện thêm để hiểu nghĩa chính xác hơn! 💪';
+           } else {
+               performanceLevel = 'Cần cải thiện';
+               performanceIcon = 'fas fa-fist-raised';
+               performanceColor = '#ef4444';
+               advice = 'Cần luyện thêm khả năng hiểu nghĩa! 🔥';
+           }
+
+           document.getElementById('meaningFinalScore').innerHTML = `
+               <div style="color: ${performanceColor}; margin-bottom: 15px;">
+                   <i class="${performanceIcon}"></i> ${performanceLevel}
+               </div>
+               <div>Điểm số: ${averageScore}/100</div>
+               <div style="font-size: 1.2rem; margin-top: 10px;">
+                   ✅ Số câu hiểu đúng nghĩa: ${correctCount}/10 (≥60%)
+               </div>
+               <div style="font-size: 1rem; margin-top: 15px; color: var(--gray-600); font-style: italic;">
+                   ${advice}
+               </div>
+           `;
+
+           const resultDetails = document.getElementById('meaningResultDetails');
+           resultDetails.innerHTML = results.map((result, index) => `
+               <div class="result-item ${result.isCorrect ? 'correct' : 'incorrect'}">
+                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                       <strong>Câu ${index + 1}</strong>
+                       <div style="display: flex; gap: 10px; align-items: center;">
+                           <button class="btn btn-play" style="padding: 6px 12px; font-size: 0.8rem; background: linear-gradient(135deg, #ff9800, #f57c00);" onclick="replayMeaningResultQuestion(${index})">
+                               <i class="fas fa-volume-up"></i> Nghe lại
+                           </button>
+                           <div style="background: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;">
+                               ${result.score}%
+                           </div>
+                       </div>
+                   </div>
+                   <div style="margin-bottom: 8px;"><strong>Câu gốc:</strong> <span style="color: var(--primary); font-weight: 600;">${escapeHtml(result.question.english)}</span></div>
+                   <div style="margin-bottom: 8px;"><strong>Nghĩa đúng:</strong> <span style="color: var(--success); font-weight: 600;">${escapeHtml(result.correctAnswer)}</span></div>
+                   <div><strong>Bạn hiểu:</strong> <span style="color: ${result.isCorrect ? 'var(--success)' : 'var(--error)'}; font-weight: 500;">${escapeHtml(result.userAnswer)}</span></div>
+               </div>
+           `).join('');
+
+           showNotification(`🧠 Hoàn thành kiểm tra hiểu nghĩa! Điểm: ${averageScore}/100`, 'success');
+       }
+
+       // Reset meaning test
+       function resetMeaningTest() {
+           window.currentMeaningTest.isActive = false;
+           window.currentMeaningTest.currentIndex = 0;
+           window.currentMeaningTest.answers = [];
+           window.currentMeaningTest.questions = [];
+           window.currentMeaningTest.voiceForQuestions = [];
+
+           document.getElementById('meaningTestStart').style.display = 'block';
+           document.getElementById('meaningTestQuestion').style.display = 'none';
+           document.getElementById('meaningTestResult').style.display = 'none';
+       }
+
+       // Replay question in meaning test results
+       function replayMeaningResultQuestion(questionIndex) {
+           if (window.currentMeaningTest.questions && window.currentMeaningTest.voiceForQuestions) {
+               const question = window.currentMeaningTest.questions[questionIndex];
+               const voiceConfig = window.currentMeaningTest.voiceForQuestions[questionIndex];
+               speakTextWithSpecificVoice(question.english, voiceConfig);
+           }
+       }
+
+       // Hàm phát âm với giọng nói được chỉ định
+       function speakTextWithSpecificVoice(text, voiceConfig) {
+           if ('speechSynthesis' in window) {
+               speechSynthesis.cancel();
+
+               const speakWithVoices = () => {
+                   const voices = speechSynthesis.getVoices();
+                   if (voices.length === 0) {
+                       setTimeout(speakWithVoices, 100);
+                       return;
+                   }
+
+                   const englishVoices = voices.filter(voice =>
+                       voice.lang.startsWith('en-') && voice.name.length > 0
+                   );
+
+                   // Tìm giọng phù hợp dựa trên config đã chỉ định
+                   let selectedVoice = null;
+                   for (const preferredName of voiceConfig.preferredNames) {
+                       selectedVoice = englishVoices.find(voice => 
+                           voice.name.toLowerCase().includes(preferredName)
+                       );
+                       if (selectedVoice) break;
+                   }
+
+                   if (!selectedVoice) {
+                       if (voiceConfig.type.includes('female')) {
+                           selectedVoice = englishVoices.find(voice => 
+                               voice.name.toLowerCase().includes('female') ||
+                               ['alice', 'allison', 'ava', 'emma', 'fiona', 'karen', 'moira', 'samantha', 'sarah', 'susan', 'tessa', 'veena', 'victoria', 'zoe', 'hazel'].some(name =>
+                                   voice.name.toLowerCase().includes(name)
+                               )
+                           );
+                       } else {
+                           selectedVoice = englishVoices.find(voice => 
+                               voice.name.toLowerCase().includes('male') ||
+                               ['alex', 'arthur', 'daniel', 'david', 'fred', 'george', 'james', 'john', 'lee', 'marcus', 'nathan', 'oliver', 'ralph', 'ryan', 'thomas', 'tom'].some(name =>
+                                   voice.name.toLowerCase().includes(name)
+                               )
+                           );
+                       }
+                   }
+
+                   if (!selectedVoice && englishVoices.length > 0) {
+                       selectedVoice = englishVoices[0];
+                   }
+
+                   const utterance = new SpeechSynthesisUtterance(text);
+                   if (selectedVoice) {
+                       utterance.voice = selectedVoice;
+                       utterance.lang = selectedVoice.lang;
+                   }
+
+                   utterance.rate = voiceConfig.rate;
+                   utterance.pitch = voiceConfig.pitch;
+                   utterance.volume = voiceConfig.volume;
+
+                   utterance.addEventListener('error', (e) => {
+                       console.error('Speech synthesis error:', e);
+                       showNotification('Please wait to load!', 'error');
+                   });
+
+                   speechSynthesis.speak(utterance);
+               };
+
+               speakWithVoices();
+           }
+       }
+
+       // Replay question in listening test results
+       function replayResultQuestion(questionIndex) {
+           if (window.currentTest.questions && window.currentTest.voiceForQuestions) {
+               const question = window.currentTest.questions[questionIndex];
+               const voiceConfig = window.currentTest.voiceForQuestions[questionIndex];
+               speakTextWithSpecificVoice(question.english, voiceConfig);
+           }
        }
 
        // Keyboard shortcuts và event listeners
@@ -1356,8 +1720,13 @@ resultDetails.innerHTML = results.map((result, index) => `
                }
            });
 
-           // Space bar to replay audio during test
-           
+           // Meaning test answer input Enter -> Next question
+           document.addEventListener('keypress', function (e) {
+               const meaningAnswerInput = document.getElementById('meaningAnswerInput');
+               if (e.key === 'Enter' && meaningAnswerInput && document.activeElement === meaningAnswerInput) {
+                   nextMeaningQuestion();
+               }
+           });
 
            // Update voice info periodically
            setTimeout(() => {
@@ -1376,148 +1745,93 @@ resultDetails.innerHTML = results.map((result, index) => `
        // Add CSS animations
        const style = document.createElement('style');
        style.textContent = `
-          @keyframes slideInRight {
-              from {
-                  transform: translateX(100%);
-                  opacity: 0;
-              }
-              to {
-                  transform: translateX(0);
-                  opacity: 1;
-              }
-          }
-          
-          @keyframes slideOutRight {
-              from {
-                  transform: translateX(0);
-                  opacity: 1;
-              }
-              to {
-                  transform: translateX(100%);
-                  opacity: 0;
-              }
-          }
+         @keyframes slideInRight {
+             from {
+                 transform: translateX(100%);
+                 opacity: 0;
+             }
+             to {
+                 transform: translateX(0);
+                 opacity: 1;
+             }
+         }
+         
+         @keyframes slideOutRight {
+             from {
+                 transform: translateX(0);
+                 opacity: 1;
+             }
+             to {
+                 transform: translateX(100%);
+                 opacity: 0;
+             }
+         }
 
-          /* Enhanced styles for B1 level */
-          .test-info {
-              background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
-              border: 2px solid #2196f3 !important;
-          }
+         /* Enhanced styles for B1 level */
+         .test-info {
+             background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+             border: 2px solid #2196f3 !important;
+         }
 
-          .question-container {
-              border: 2px solid var(--primary) !important;
-              background: linear-gradient(135deg, #f8faff, white) !important;
-          }
+         .question-container {
+             border: 2px solid var(--primary) !important;
+             background: linear-gradient(135deg, #f8faff, white) !important;
+         }
 
-          .play-button {
-              background: linear-gradient(135deg, #2196f3, #1976d2) !important;
-              box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-          }
+         .play-button {
+             background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+             box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+         }
 
-          .play-button:hover {
-              transform: scale(1.05) !important;
-              box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4) !important;
-          }
+         .play-button:hover {
+             transform: scale(1.05) !important;
+             box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4) !important;
+         }
 
-          /* B1 Voice button styling */
-          .btn-play {
-              background: linear-gradient(135deg, #2196f3, #1976d2) !important;
-              color: white !important;
-          }
+         /* B1 Voice button styling */
+         .btn-play {
+             background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+             color: white !important;
+         }
 
-          .btn-play:hover {
-              box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3) !important;
-          }
-      `;
+         .btn-play:hover {
+             box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3) !important;
+         }
+
+         /* Meaning test specific styles */
+         #meaning-test .test-info {
+             background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+             border: 2px solid #ff9800 !important;
+         }
+
+         #meaning-test .question-container {
+             border: 2px solid #ff9800 !important;
+             background: linear-gradient(135deg, #fffbf0, white) !important;
+         }
+
+         /* Warning button styles */
+         .btn-warning {
+             background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+             color: white !important;
+             border: none !important;
+         }
+
+         .btn-warning:hover {
+             box-shadow: 0 8px 25px rgba(255, 152, 0, 0.3) !important;
+             transform: translateY(-2px);
+         }
+     `;
        document.head.appendChild(style);
 
        // Thông báo chào mừng về hệ thống B1
        setTimeout(() => {
            if (document.getElementById('practice').classList.contains('active')) {
-               showNotification('🎯 Chào mừng đến với hệ thống luyện nghe B1!', 'info');
+               showNotification('🎯 Chào mừng đến với hệ thống luyện nghe!', 'info');
            }
        }, 2000);
 
-       // Hàm phát âm với giọng nói được chỉ định
-function speakTextWithSpecificVoice(text, voiceConfig) {
-    if ('speechSynthesis' in window) {
-        speechSynthesis.cancel();
-
-        const speakWithVoices = () => {
-            const voices = speechSynthesis.getVoices();
-            if (voices.length === 0) {
-                setTimeout(speakWithVoices, 100);
-                return;
-            }
-
-            const englishVoices = voices.filter(voice =>
-                voice.lang.startsWith('en-') && voice.name.length > 0
-            );
-
-            // Tìm giọng phù hợp dựa trên config đã chỉ định
-            let selectedVoice = null;
-            for (const preferredName of voiceConfig.preferredNames) {
-                selectedVoice = englishVoices.find(voice => 
-                    voice.name.toLowerCase().includes(preferredName)
-                );
-                if (selectedVoice) break;
-            }
-
-            if (!selectedVoice) {
-                if (voiceConfig.type.includes('female')) {
-                    selectedVoice = englishVoices.find(voice => 
-                        voice.name.toLowerCase().includes('female') ||
-                        ['alice', 'allison', 'ava', 'emma', 'fiona', 'karen', 'moira', 'samantha', 'sarah', 'susan', 'tessa', 'veena', 'victoria', 'zoe', 'hazel'].some(name =>
-                            voice.name.toLowerCase().includes(name)
-                        )
-                    );
-                } else {
-                    selectedVoice = englishVoices.find(voice => 
-                        voice.name.toLowerCase().includes('male') ||
-                        ['alex', 'arthur', 'daniel', 'david', 'fred', 'george', 'james', 'john', 'lee', 'marcus', 'nathan', 'oliver', 'ralph', 'ryan', 'thomas', 'tom'].some(name =>
-                            voice.name.toLowerCase().includes(name)
-                        )
-                    );
-                }
-            }
-
-            if (!selectedVoice && englishVoices.length > 0) {
-                selectedVoice = englishVoices[0];
-            }
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-                utterance.lang = selectedVoice.lang;
-            }
-
-            utterance.rate = voiceConfig.rate;
-            utterance.pitch = voiceConfig.pitch;
-            utterance.volume = voiceConfig.volume;
-
-            utterance.addEventListener('error', (e) => {
-                console.error('Speech synthesis error:', e);
-                showNotification('Please wait to load!', 'error');
-            });
-
-            speechSynthesis.speak(utterance);
-        };
-
-        speakWithVoices();
-    }
-}
-
-// Hàm phát lại câu trong kết quả với giọng đã sử dụng
-function replayResultQuestion(questionIndex) {
-    if (window.currentTest.questions && window.currentTest.voiceForQuestions) {
-        const question = window.currentTest.questions[questionIndex];
-        const voiceConfig = window.currentTest.voiceForQuestions[questionIndex];
-        speakTextWithSpecificVoice(question.english, voiceConfig);
-    }
-}
-
-
    </script>
 </body>
+
 
 </html>
